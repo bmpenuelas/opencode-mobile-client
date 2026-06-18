@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+        Cleartext HTTP is permitted for LAN OpenCode servers.
+        This is a requirement when connecting to self-hosted servers
+        that do not have TLS configured.
+
+        Security consideration: Allowing cleartext is acceptable for
+        trusted local networks. For remote access, use a VPN or
+        HTTPS reverse proxy.
+
+        See README for details.
+    -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
