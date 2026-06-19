@@ -1,3 +1,5 @@
+/// <reference types="@capacitor/local-notifications" />
+
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -27,6 +29,9 @@ const config: CapacitorConfig = {
       navigationBar: {
         style: 'DARK',
       },
+    },
+    LocalNotifications: {
+      presentationOptions: ['badge', 'sound', 'banner', 'list'],
     },
   },
 };

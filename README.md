@@ -239,7 +239,7 @@ When authentication is disabled on the server, the iframe loads the plain URL wi
 2. **Frame-blocking headers**: Some OpenCode deployments may block iframe embedding. The app detects this and offers a fallback native webview option.
 3. **Web dev CORS**: Health checks in browser dev mode may be blocked by CORS. Native builds use `CapacitorHttp` which bypasses this.
 4. **Single iframe**: Only one OpenCode session at a time. The app shows one server's UI in the full screen.
-5. **No push notifications**: The app does not support push notifications from OpenCode.
+5. **No server push notifications**: The app does not receive background push from OpenCode, but web notifications emitted by the connected OpenCode UI are re-emitted as local native notifications while the WebView is open.
 
 ---
 
