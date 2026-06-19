@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <!--
-        Cleartext HTTP is permitted for LAN OpenCode servers.
-        This is a requirement when connecting to self-hosted servers
-        that do not have TLS configured.
+        Cleartext HTTP is permitted because users provide their own OpenCode
+        server URLs. Local/private and VPN/Tailscale servers may use HTTP;
+        public/VPS servers should use HTTPS.
 
-        Security consideration: Allowing cleartext is acceptable for
-        trusted local networks. For remote access, use a VPN or
-        HTTPS reverse proxy.
+        Store review/security tradeoff: Android network-security-config cannot
+        express all possible user-provided private/VPN hosts without also
+        risking false blocks. The app warns on public HTTP but does not block it
+        unless the product policy explicitly changes.
 
         See README for details.
     -->

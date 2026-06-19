@@ -24,7 +24,10 @@
     "cap:assets:post": "node scripts/generate-asset-inputs.mjs --post-cap",
     "cap:assets": "npm run cap:assets:inputs && npx capacitor-assets generate --ios --android --pwa && npm run cap:assets:post",
     "android:play:bundle": "node ./scripts/android-release.mjs bundleRelease",
-    "android:play:apk": "node ./scripts/android-release.mjs assembleRelease"
+    "android:play:apk": "node ./scripts/android-release.mjs assembleRelease",
+    "android:start-adb": "adb start-server",
+    "android:install": "node ./scripts/android-install.mjs",
+    "store:verify": "node ./scripts/verify-store-readiness.mjs"
   },
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "^8.0.0",

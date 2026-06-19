@@ -40,6 +40,15 @@ const profile = computed(() => serverStore.profiles.find(p => p.id === serverId.
 let browserClosedHandle: any = null
 let pageLoadedHandle: any = null
 
+function jsStringLiteral(value: string): string {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+}
+
 function buildToolbarScript(status: string, displayUrl: string): string {
   const dotColor =
     status === 'connected' ? '#30d158' :
@@ -60,6 +69,9 @@ function buildToolbarScript(status: string, displayUrl: string): string {
     status === 'frame_blocked' ? 'Blocked' :
     status
 
+  const statusLabelLiteral = jsStringLiteral(statusLabel)
+  const displayUrlLiteral = jsStringLiteral(displayUrl)
+
   return `(function(){
     if(document.getElementById('oc-tab'))return;
     var s=document.createElement('style');
@@ -71,8 +83,8 @@ function buildToolbarScript(status: string, displayUrl: string): string {
     var panel=document.createElement('div');panel.id='oc-panel';
     var statusRow=document.createElement('div');statusRow.id='oc-panel-status';
     var dot=document.createElement('span');dot.id='oc-panel-dot';
-    var label=document.createElement('span');label.textContent='${statusLabel}';
-    var urlSpan=document.createElement('span');urlSpan.id='oc-panel-url';urlSpan.textContent='${displayUrl}';
+    var label=document.createElement('span');label.textContent=${statusLabelLiteral};
+    var urlSpan=document.createElement('span');urlSpan.id='oc-panel-url';urlSpan.textContent=${displayUrlLiteral};
     statusRow.appendChild(dot);statusRow.appendChild(label);statusRow.appendChild(urlSpan);
     panel.appendChild(statusRow);
     var items=document.createElement('div');items.id='oc-panel-items';

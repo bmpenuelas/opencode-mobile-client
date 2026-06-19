@@ -85,6 +85,18 @@ describe('validateUrl', () => {
     expect(result.valid).toBe(true)
     expect(result.error).toBeUndefined()
   })
+
+  it('accepts Tailscale CGNAT HTTP without warning', () => {
+    const result = validateUrl('http://100.64.12.34:4096')
+    expect(result.valid).toBe(true)
+    expect(result.error).toBeUndefined()
+  })
+
+  it('accepts local mDNS HTTP without warning', () => {
+    const result = validateUrl('http://opencode.local:4096')
+    expect(result.valid).toBe(true)
+    expect(result.error).toBeUndefined()
+  })
 })
 
 describe('sanitizeUrlForDisplay', () => {

@@ -1,0 +1,8 @@
+// Release build settings for TestFlight / App Store uploads.
+//
+// The team ID matches the existing Xcode project setting. Update it only if
+// the Apple Developer account changes.
+CAPACITOR_DEBUG = false
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM = 7U4S5B8FNA
+CODE_SIGN_IDENTITY = Apple Distribution

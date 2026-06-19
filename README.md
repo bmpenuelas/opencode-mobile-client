@@ -147,6 +147,9 @@ In Xcode, build and run on a device/simulator.
 | `npm run cap:add:ios` | Add iOS platform |
 | `npm run cap:open:android` | Open Android project in Android Studio |
 | `npm run cap:open:ios` | Open iOS project in Xcode |
+| `npm run store:verify` | Check store-readiness config files and release scaffolding |
+| `npm run android:play:bundle` | Build a signed Android App Bundle for Play Console (requires signing config) |
+| `npm run android:play:apk` | Build a signed Android release APK (requires signing config) |
 
 ---
 
@@ -205,6 +208,7 @@ The app allows connecting to HTTP servers because OpenCode servers commonly run 
 
 - **Recommended**: Tailscale, WireGuard, or OpenVPN to securely extend your LAN
 - **Alternative**: Put OpenCode behind an HTTPS reverse proxy (Caddy, Nginx, Traefik) with proper TLS termination
+- **Public/VPS servers**: use HTTPS. The app may warn on public HTTP, but does not block it unless product policy changes.
 
 **Do not expose OpenCode directly to the public internet without strong authentication and transport security.**
 
@@ -236,6 +240,25 @@ When authentication is disabled on the server, the iframe loads the plain URL wi
 3. **Web dev CORS**: Health checks in browser dev mode may be blocked by CORS. Native builds use `CapacitorHttp` which bypasses this.
 4. **Single iframe**: Only one OpenCode session at a time. The app shows one server's UI in the full screen.
 5. **No push notifications**: The app does not support push notifications from OpenCode.
+
+---
+
+## Store Release Readiness
+
+Store-readiness notes, review-risk flags, and draft listing metadata live in:
+
+- `docs/store-readiness.md`
+- `docs/webview-injection-review.md`
+- `store/`
+
+Before release, run:
+
+```bash
+npm run store:verify
+npm run lint
+npm test
+npm run build
+```
 
 ---
 

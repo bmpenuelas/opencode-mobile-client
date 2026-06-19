@@ -38,7 +38,7 @@ export function validateUrl(url: string): ValidationResult {
       return { valid: false, error: 'Embedded credentials in URL are not allowed. Use the separate auth fields instead.' }
     }
 
-    if (parsed.protocol === 'http:' && parsed.hostname !== 'localhost' && !/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(parsed.hostname) && !/^192\.168\.\d{1,3}\.\d{1,3}$/.test(parsed.hostname) && !/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(parsed.hostname) && !/^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(parsed.hostname)) {
+    if (parsed.protocol === 'http:' && !isLocalOrPrivateHost(parsed.hostname)) {
       return { valid: true, error: 'Using HTTP over the internet is not secure. Use HTTPS or a VPN for remote connections.' }
     }
 
@@ -46,6 +46,19 @@ export function validateUrl(url: string): ValidationResult {
   } catch {
     return { valid: false, error: 'Invalid URL format' }
   }
+}
+
+function isLocalOrPrivateHost(hostname: string): boolean {
+  const host = hostname.toLowerCase()
+  return (
+    host === 'localhost' ||
+    host.endsWith('.local') ||
+    /^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host) ||
+    /^192\.168\.\d{1,3}\.\d{1,3}$/.test(host) ||
+    /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host) ||
+    /^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(host) ||
+    /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}$/.test(host)
+  )
 }
 
 export function sanitizeUrlForDisplay(url: string): string {
