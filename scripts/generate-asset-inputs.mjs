@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
-import { cp, writeFile } from 'node:fs/promises'
+import { copyFile, cp, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import sharp from 'sharp'
 
@@ -9,6 +9,7 @@ const ASSETS_DIR = resolve('assets')
 const PUBLIC_DIR = resolve('public')
 const ICONS_DIR = resolve('icons')
 const PUBLIC_ICONS_DIR = resolve('public/icons')
+const DOCS_DIR = resolve('docs')
 const ANDROID_RES = resolve('android/app/src/main/res')
 
 const BG_LIGHT = '#f1ecec'
@@ -144,6 +145,21 @@ async function generateStandaloneAssets() {
   )
 }
 
+async function copyDocsAssets() {
+  ensureDir(DOCS_DIR)
+  const files = [
+    'favicon.svg',
+    'opencode-mobile-client-logo-dark.svg',
+    'opencode-mobile-client-logo-light.svg',
+  ]
+  for (const file of files) {
+    const src = resolve(PUBLIC_DIR, file)
+    const dest = resolve(DOCS_DIR, file)
+    await copyFile(src, dest)
+    console.log(`docs/${file}`)
+  }
+}
+
 async function generateAdaptiveIconForegrounds(svgPath) {
   const svg = readFileSync(svgPath)
 
@@ -177,6 +193,7 @@ async function main() {
 
   await generateCapacitorAssetsInputs()
   await generateStandaloneAssets()
+  await copyDocsAssets()
 
   await moveIconsToPublic()
   fixManifestPaths()

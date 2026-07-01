@@ -204,6 +204,26 @@
         color: var(--text-dim);
       }
 
+      .ribbon {
+        position: fixed;
+        top: 0;
+        right: 0;
+        transform: rotate(45deg) translateX(30%) translateY(-50%);
+        transform-origin: center;
+        background: var(--accent);
+        color: #121212;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.25rem 2rem;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        z-index: 1000;
+        user-select: none;
+        text-align: center;
+        line-height: 1;
+        text-decoration: none;
+      }
+
       @media (max-width: 540px) {
         .container {
           padding: 2rem 1rem 3rem;
@@ -221,6 +241,11 @@
     </style>
   </head>
   <body>
+    <a
+      href="https://github.com/bmpenuelas/opencode-mobile-client"
+      class="ribbon"
+      >non-official<br />community project</a
+    >
     <div class="container">
       <header>
         <picture>
@@ -267,7 +292,10 @@
             🔑 Basic Auth support (matching OpenCode's
             <code>OPENCODE_SERVER_PASSWORD</code>)
           </li>
-          <li>🎛️ Pull-down menu for server management while connected. Pull to refresh, tap ⋮ to open menu.</li>
+          <li>
+            🎛️ Pull-down menu for server management while connected. Pull to
+            refresh, tap ⋮ to open menu.
+          </li>
           <li>❤️ Automatic health checks with exponential reconnect</li>
           <li>
             🔒 Secure storage for passwords (Keychain /
