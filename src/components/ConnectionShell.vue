@@ -1,5 +1,10 @@
 <template>
-  <div class="fixed inset-0 flex flex-col items-center justify-center z-[1] bg-background">
+  <DemoSessionMock
+    v-if="demoModeActive && profile"
+    :profile-name="profile.name"
+  />
+
+  <div v-else class="fixed inset-0 flex flex-col items-center justify-center z-[1] bg-background">
     <div v-if="loading" class="flex flex-col items-center gap-4">
       <div class="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-foreground" />
       <p class="text-sm text-muted-foreground">Loading OpenCode...</p>
@@ -19,12 +24,14 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
+import DemoSessionMock from '@/components/DemoSessionMock.vue'
 import { InAppBrowser, ToolBarType, BackgroundColor } from '@capgo/capacitor-inappbrowser'
 import { Capacitor } from '@capacitor/core'
 import { useServerStore } from '@/stores/serverStore'
 import { useConnectionStore } from '@/stores/connectionStore'
 import { registerBackButton, unregisterBackButton } from '@/services/platform/backButton'
 import { buildIframeUrl } from '@/services/opencode/url'
+import { isDemoModeServer } from '@/services/opencode/demoMode'
 import {
   approveNativeNotificationsFromPrompt,
   denyNativeNotificationsFromPrompt,
@@ -43,6 +50,7 @@ const errorText = ref('')
 
 const serverId = computed(() => route.params.id as string)
 const profile = computed(() => serverStore.profiles.find(p => p.id === serverId.value))
+const demoModeActive = ref(false)
 
 let browserClosedHandle: any = null
 let pageLoadedHandle: any = null
@@ -331,6 +339,12 @@ onMounted(async () => {
   }
 
   connectionStore.lastWebviewServerId = profile.value.id
+  demoModeActive.value = await isCurrentProfileDemoMode()
+
+  if (demoModeActive.value) {
+    loading.value = false
+    return
+  }
 
   if (Capacitor.isNativePlatform()) {
     await openInAppBrowser()
@@ -346,6 +360,16 @@ onUnmounted(() => {
   if (messageFromWebviewHandle) messageFromWebviewHandle.remove()
   resolveNotificationPrompt(false)
 })
+
+async function isCurrentProfileDemoMode(): Promise<boolean> {
+  if (!profile.value?.authEnabled) return false
+  const pw = await serverStore.getPassword(profile.value.id)
+  return isDemoModeServer({
+    baseUrl: profile.value.baseUrl,
+    username: profile.value.username,
+    password: pw,
+  })
+}
 
 async function openInAppBrowser(): Promise<void> {
   const pw = await serverStore.getPassword(profile.value!.id)
@@ -417,6 +441,11 @@ async function retry(): Promise<void> {
   const connected = await connectionStore.connect(profile.value.id)
   if (connected) {
     connectionStore.lastWebviewServerId = profile.value.id
+    demoModeActive.value = await isCurrentProfileDemoMode()
+    if (demoModeActive.value) {
+      loading.value = false
+      return
+    }
     if (Capacitor.isNativePlatform()) {
       await openInAppBrowser()
     } else {

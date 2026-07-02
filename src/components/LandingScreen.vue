@@ -34,7 +34,7 @@
               <CardTitle class="text-sm">{{ defaultProfile.name }}</CardTitle>
               <CardDescription class="text-xs break-all">{{ sanitizeUrl(defaultProfile.baseUrl) }}</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" @click.stop="connectDefault" title="Connect">&#9654;</Button>
+            <Button variant="ghost" size="sm" @click.stop="connectDefault" title="Connect"><Play class="fill-current size-3" /></Button>
           </CardContent>
           <CardFooter class="text-xs text-muted-foreground pt-[4.7px] pb-3">
             {{ stateLabel }}
@@ -88,6 +88,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card'
+import { Play } from '@lucide/vue'
 import { useServerStore } from '@/stores/serverStore'
 import { useConnectionStore } from '@/stores/connectionStore'
 import { sanitizeUrlForDisplay } from '@/services/opencode/url'

@@ -7,7 +7,7 @@
       <h1 class="text-lg font-semibold">{{ isEdit ? 'Edit Server' : 'Add Server' }}</h1>
     </header>
 
-    <form class="flex-1 p-4 flex flex-col overflow-y-auto pb-6" @submit.prevent="handleSubmit">
+    <form novalidate class="flex-1 p-4 flex flex-col overflow-y-auto pb-6" @submit.prevent="handleSubmit">
       <div class="flex-1 flex flex-col justify-center gap-4">
       <Card>
         <CardContent class="flex flex-col gap-4">
@@ -70,6 +70,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useServerStore } from '@/stores/serverStore'
 import { normalizeUrl, validateUrl } from '@/services/opencode/url'
+import { isDemoModeCredentials } from '@/services/opencode/demoMode'
 import type { ServerProfile } from '@/types'
 
 const router = useRouter()
@@ -95,8 +96,24 @@ const formError = ref('')
 const urlError = ref('')
 const urlWarning = ref('')
 
+function isDemoCredentialsInForm(): boolean {
+  return form.value.authEnabled && isDemoModeCredentials({
+    username: form.value.username,
+    password: form.value.password,
+  })
+}
+
 watch(() => form.value.baseUrl, () => {
   urlError.value = ''; urlWarning.value = ''
+  if (isDemoCredentialsInForm()) return
+  const result = validateUrl(form.value.baseUrl)
+  if (!result.valid) urlError.value = result.error ?? 'Invalid URL'
+  else if (result.error) urlWarning.value = result.error
+})
+
+watch(() => [form.value.authEnabled, form.value.username, form.value.password], () => {
+  urlError.value = ''; urlWarning.value = ''
+  if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
   if (!result.valid) urlError.value = result.error ?? 'Invalid URL'
   else if (result.error) urlWarning.value = result.error
@@ -126,13 +143,17 @@ onMounted(async () => {
 async function handleSubmit(): Promise<void> {
   formError.value = ''
   if (!form.value.name.trim()) { formError.value = 'Server name is required'; return }
-  const urlResult = validateUrl(form.value.baseUrl)
-  if (!urlResult.valid) { formError.value = urlResult.error ?? 'Invalid URL'; return }
+  const demoCredentials = isDemoCredentialsInForm()
+  if (!demoCredentials) {
+    const urlResult = validateUrl(form.value.baseUrl)
+    if (!urlResult.valid) { formError.value = urlResult.error ?? 'Invalid URL'; return }
+  }
 
   saving.value = true
   try {
     const data = {
-      name: form.value.name.trim(), baseUrl: normalizeUrl(form.value.baseUrl),
+      name: form.value.name.trim(),
+      baseUrl: demoCredentials ? form.value.baseUrl.trim() : normalizeUrl(form.value.baseUrl),
       authEnabled: form.value.authEnabled,
       username: form.value.authEnabled ? form.value.username || 'opencode' : 'opencode',
       isDefault: form.value.isDefault,

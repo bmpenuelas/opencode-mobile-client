@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { platform } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "..");
@@ -113,7 +114,7 @@ function openApp() {
   console.log("\nApp launched. Navigate to the desired screen on the device.");
 }
 
-function capture(name) {
+async function capture(name) {
   if (!existsSync(outDir)) {
     mkdirSync(outDir, { recursive: true });
   }
@@ -121,14 +122,18 @@ function capture(name) {
   const serial = getSerial();
   console.log(`Capturing screenshot → ${filePath}`);
   const result = spawnSync("adb", ["-s", serial, "exec-out", "screencap", "-p"], {
-    encoding: "binary",
     cwd: repoRoot,
   });
   if (result.error || typeof result.status !== "number" || result.status !== 0) {
     console.error("Screenshot capture failed.");
     process.exit(1);
   }
-  writeFileSync(filePath, result.stdout, "binary");
+  const img = sharp(result.stdout);
+  const meta = await img.metadata();
+  await img
+    .extract({ left: 0, top: 100, width: meta.width, height: meta.height - 100 })
+    .png()
+    .toFile(filePath);
   console.log(`Saved → ${filePath}`);
 }
 
@@ -188,7 +193,7 @@ if (mode === "guided") {
         resolve();
       });
     });
-    capture(screen.name);
+    await capture(screen.name);
   }
   console.log("\nAll screenshots captured!");
   process.exit(0);
@@ -200,7 +205,7 @@ if (mode === "capture") {
     console.error("Usage: node scripts/screenshots-android.mjs capture <name>");
     process.exit(1);
   }
-  capture(name);
+  await capture(name);
   process.exit(0);
 }
 

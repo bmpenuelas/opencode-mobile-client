@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core'
 import type { HealthCheckResult, ServerStatus } from '@/types'
 import { normalizeUrl } from './url'
 import { buildBasicAuthHeader } from './auth'
+import { isDemoModeServer } from './demoMode'
 
 interface HealthCheckOptions {
   baseUrl: string
@@ -76,6 +77,15 @@ function classifyStatus(statusCode: number, hadAuth: boolean): ServerStatus {
 
 export async function checkServerHealth(options: HealthCheckOptions): Promise<HealthCheckResult> {
   const { baseUrl, username, password, timeoutMs = 3500 } = options
+
+  if (isDemoModeServer({ baseUrl, username, password })) {
+    return {
+      reachable: true,
+      status: 'connected',
+      statusCode: 200,
+    }
+  }
+
   const normalized = normalizeUrl(baseUrl)
   const healthUrl = `${normalized}/`
   const headers: Record<string, string> = {}

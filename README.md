@@ -2,7 +2,9 @@
 
 💫 A lightweight mobile client that wraps the [OpenCode Web](https://opencode.ai/docs/web/) UI as native Android and iOS apps. Connects to an already-running OpenCode server over LAN or VPN / Tailscale.
 
-Chat with the agent on your phone while the agent and the server run on your computer and edit code and use all the tools available on it 🖥️
+Chat with your agents from your phone while they and the server run on your computer, with full access to your code and tools 🖥️
+
+🔃 Seamlessly continue sessions started on your computer from your phone, or vice versa
 
 ---
 

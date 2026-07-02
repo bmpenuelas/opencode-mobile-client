@@ -50,7 +50,7 @@
             >
               <span aria-hidden="true" class="absolute -inset-2" />
               <span class="text-xs">open</span>
-              <span class="-ml-1 inline-flex h-8 w-8 items-center justify-end text-sm">&#9654;</span>
+              <span class="-ml-1 inline-flex h-8 w-8 items-center justify-end"><Play class="fill-current size-3" /></span>
             </button>
           </CardAction>
         </CardHeader>
@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft } from '@lucide/vue'
+import { ArrowLeft, Play } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardAction } from '@/components/ui/card'
