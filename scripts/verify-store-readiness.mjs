@@ -38,8 +38,9 @@ check(
   "iOS ATS is configured",
   infoPlist.includes("NSAppTransportSecurity") &&
     infoPlist.includes("NSAllowsLocalNetworking") &&
-    infoPlist.includes("NSAllowsArbitraryLoadsInWebContent"),
-  "ATS must preserve local/private HTTP and WebView server support"
+    infoPlist.includes("NSAllowsArbitraryLoadsInWebContent") &&
+    infoPlist.includes("NSLocalNetworkUsageDescription"),
+  "ATS and the local-network privacy prompt must preserve LAN/private WebView server support"
 );
 check(
   "iOS arm64 device capability is set",
