@@ -60,6 +60,15 @@ let notificationPromptPromise: Promise<boolean> | null = null
 
 const WEB_NOTIFICATION_PROMPT_RESPONSE_MESSAGE_TYPE = 'opencode:web-notification-prompt-response'
 
+function removeWebviewListeners(): void {
+  if (browserClosedHandle) void browserClosedHandle.remove()
+  if (pageLoadedHandle) void pageLoadedHandle.remove()
+  if (messageFromWebviewHandle) void messageFromWebviewHandle.remove()
+  browserClosedHandle = null
+  pageLoadedHandle = null
+  messageFromWebviewHandle = null
+}
+
 function buildNotificationBridgeScript(): string {
   return `(function(){
     if(window.__oc_nativeNotificationBridge)return;
@@ -355,9 +364,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   unregisterBackButton()
-  if (browserClosedHandle) browserClosedHandle.remove()
-  if (pageLoadedHandle) pageLoadedHandle.remove()
-  if (messageFromWebviewHandle) messageFromWebviewHandle.remove()
+  removeWebviewListeners()
   resolveNotificationPrompt(false)
 })
 
@@ -372,15 +379,16 @@ async function isCurrentProfileDemoMode(): Promise<boolean> {
 }
 
 async function openInAppBrowser(): Promise<void> {
+  const isIOS = Capacitor.getPlatform() === 'ios'
   const pw = await serverStore.getPassword(profile.value!.id)
-  const url = buildIframeUrl(profile.value!.baseUrl)
-
   const auth = profile.value!.authEnabled && pw
+  const url = isIOS && auth
+    ? buildIframeUrl(profile.value!.baseUrl, profile.value!.username, pw!)
+    : buildIframeUrl(profile.value!.baseUrl)
 
   browserClosedHandle = await InAppBrowser.addListener('closeEvent', () => {
     connectionStore.disconnect()
-    if (pageLoadedHandle) pageLoadedHandle.remove()
-    if (messageFromWebviewHandle) messageFromWebviewHandle.remove()
+    removeWebviewListeners()
     resolveNotificationPrompt(false)
     router.push('/')
   })
@@ -402,24 +410,33 @@ async function openInAppBrowser(): Promise<void> {
     await InAppBrowser.executeScript({ code: script })
   })
 
-  await InAppBrowser.openWebView({
-    url,
-    toolbarType: ToolBarType.BLANK,
-    toolbarColor: '#121212',
-    backgroundColor: BackgroundColor.BLACK,
-    enabledSafeBottomMargin: true,
-    disableOverscroll: true,
-    activeNativeNavigationForWebview: true,
-    isPresentAfterPageLoad: true,
-    preShowScriptInjectionTime: 'documentStart',
-    preShowScript: buildNotificationBridgeScript(),
-    ...(auth ? {
-      credentials: {
-        username: profile.value!.username,
-        password: pw!,
-      },
-    } : {}),
-  })
+  try {
+    await InAppBrowser.openWebView({
+      url,
+      toolbarType: ToolBarType.BLANK,
+      toolbarColor: '#121212',
+      backgroundColor: BackgroundColor.BLACK,
+      useTopInset: true,
+      enabledSafeBottomMargin: true,
+      disableOverscroll: true,
+      activeNativeNavigationForWebview: true,
+      isPresentAfterPageLoad: true,
+      preShowScriptInjectionTime: 'documentStart',
+      preShowScript: buildNotificationBridgeScript(),
+      ...(auth && !isIOS ? {
+        credentials: {
+          username: profile.value!.username,
+          password: pw!,
+        },
+      } : {}),
+    })
+  } catch (error) {
+    removeWebviewListeners()
+    loading.value = false
+    errorText.value = error instanceof Error
+      ? `Could not open the web viewer: ${error.message}`
+      : 'Could not open the web viewer.'
+  }
 }
 
 async function openInNewTabFallback(): Promise<void> {
