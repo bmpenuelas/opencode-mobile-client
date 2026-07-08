@@ -410,8 +410,40 @@ async function openInAppBrowser(): Promise<void> {
 
   pageLoadedHandle = await InAppBrowser.addListener('browserPageLoaded', async () => {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
-    const script = buildToolbarScript(connectionStore.state, displayUrl)
-    await InAppBrowser.executeScript({ code: script })
+    await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
+    await InAppBrowser.executeScript({
+      code: `(function(){
+        var patterns=['Error: ServerSync','Error: Settings context','settings context must be used'];
+        var hidden=new Set;
+        function hideErrors(){
+          var all=document.querySelectorAll('textarea');
+          for(var i=0;i<all.length;i++){
+            var ta=all[i];
+            if(ta.style.display==='none')continue;
+            var val=(ta.value||'').toLowerCase();
+            for(var j=0;j<patterns.length;j++){
+              if(val.indexOf(patterns[j].toLowerCase())===-1)continue;
+              var key=ta.id||ta.name||ta.getAttribute('data-slot')||i;
+              if(hidden.has(key))continue;
+              hidden.add(key);
+              ta.style.display='none';
+              var p=ta.parentElement;
+              while(p&&p!==document.body){
+                if(p.children.length===1){p.style.display='none';p=p.parentElement}
+                else break;
+              }
+              var root=document.getElementById('root');
+              if(root&&root.firstElementChild&&root.firstElementChild.contains(ta))root.firstElementChild.style.display='none';
+            }
+          }
+        }
+        hideErrors();
+        var obs=new MutationObserver(function(){hideErrors()});
+        try{obs.observe(document.body,{childList:true,subtree:true})}catch(e){}
+        setInterval(hideErrors,3000);
+        setTimeout(function(){try{obs.disconnect()}catch(e){}},120000);
+      })();`
+    })
   })
 
   appStateHandle = await App.addListener('appStateChange', (state) => {
@@ -431,6 +463,7 @@ async function openInAppBrowser(): Promise<void> {
       toolbarType: ToolBarType.BLANK,
       toolbarColor: '#121212',
       backgroundColor: BackgroundColor.BLACK,
+      isInspectable: true,
       useTopInset: false,
       enabledSafeBottomMargin: true,
       disableOverscroll: true,
