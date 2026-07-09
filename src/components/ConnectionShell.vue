@@ -458,11 +458,13 @@ async function openInAppBrowser(): Promise<void> {
   })
 
   try {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
     await InAppBrowser.openWebView({
       url,
       toolbarType: ToolBarType.BLANK,
-      toolbarColor: '#121212',
-      backgroundColor: BackgroundColor.BLACK,
+      toolbarColor: isDark ? '#121212' : '#f8f8f8',
+      backgroundColor: isDark ? BackgroundColor.BLACK : BackgroundColor.WHITE,
       isInspectable: true,
       useTopInset: false,
       enabledSafeBottomMargin: true,
