@@ -262,6 +262,34 @@ function buildToolbarScript(status: string, displayUrl: string): string {
   })()`
 }
 
+function buildMobileComposerLayoutScript(): string {
+  return `(function(){
+    if(window.__oc_mobileComposerLayoutFix)return;
+    window.__oc_mobileComposerLayoutFix=true;
+    function apply(){
+      var model=document.querySelector('[data-component="prompt-model-control"]');
+      if(!model)return;
+      model.style.setProperty('min-width','0','important');
+      model.style.setProperty('flex','1 1 auto','important');
+      model.style.setProperty('overflow','hidden','important');
+      var modelButton=model.querySelector('[data-action="prompt-model"]');
+      if(modelButton)modelButton.style.setProperty('max-width','100%','important');
+      var variant=document.querySelector('[data-component="prompt-variant-control"]');
+      if(variant){
+        variant.style.setProperty('flex','0 0 auto','important');
+        variant.style.setProperty('max-width','120px','important');
+      }
+      var controls=model.parentElement;
+      var tray=controls&&controls.parentElement;
+      if(tray)tray.style.setProperty('padding-right','48px','important');
+    }
+    apply();
+    var observer=new MutationObserver(apply);
+    if(document.body)observer.observe(document.body,{childList:true,subtree:true});
+    else document.addEventListener('DOMContentLoaded',function(){apply();observer.observe(document.body,{childList:true,subtree:true});},{once:true});
+  })();`
+}
+
 function ellipsize(value: string, maxLength = 140): string {
   return value.length > maxLength ? `${value.slice(0, maxLength - 3)}...` : value
 }
@@ -411,6 +439,7 @@ async function openInAppBrowser(): Promise<void> {
   pageLoadedHandle = await InAppBrowser.addListener('browserPageLoaded', async () => {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
+    await InAppBrowser.executeScript({ code: buildMobileComposerLayoutScript() })
     await InAppBrowser.executeScript({
       code: `(function(){
         var patterns=['Error: ServerSync','Error: Settings context','settings context must be used'];
