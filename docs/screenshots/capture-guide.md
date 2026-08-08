@@ -103,6 +103,24 @@ npm run screenshots:ios:capture <name>       # Capture current screen to docs/sc
 npm run screenshots:ios:guided          # Build → launch → step through all 7 screens with prompts
 ```
 
+### Resize iOS store screenshots
+
+The command processes screenshots in `docs/screenshots/design/iphone/` by default:
+
+```
+npm run screenshots:ios:resize
+```
+
+The command updates PNG, JPEG, and WebP screenshots in place. For each image it
+chooses the closest accepted App Store size (`1242 × 2688`, `2688 × 1242`,
+`1284 × 2778`, or `2778 × 1284`), center-crops only from the top and bottom,
+and scales it to that exact resolution. To process a different directory, pass
+it after `--`:
+
+```
+npm run screenshots:ios:resize -- path/to/screenshots
+```
+
 ### Typical workflow
 
 1. Boot your device/emulator first (Android emulator or iOS Simulator)
