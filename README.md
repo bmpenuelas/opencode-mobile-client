@@ -10,15 +10,15 @@ Chat with your agents from your phone while they and the server run on your comp
 
 ## Features
 
-- 🌐 Connect to any OpenCode server over HTTP/HTTPS (LAN or VPN /
-            Tailscale when you're away from home🚶)
+- 🌐 Connect to any OpenCode server over HTTP/HTTPS (LAN or VPN / Tailscale when you're away from home🚶)
+- ⌨️ Toggleable Enter=newline mode (Enter inserts a newline, Shift+Enter sends the prompt)
+- 📱 Injects narrow-screen fixes to the stock OpenCode web UI
 - 📋 Multiple server profiles with auto-connect support
 - 🔑 Basic Auth support (matching OpenCode's `OPENCODE_SERVER_PASSWORD`)
 - 🎛️ Pull-down menu for server management while connected. Pull to refresh, tap ⋮ to open menu.
 - ❤️ Automatic health checks with exponential reconnect
 - 🔒 Secure storage for passwords (Keychain/EncryptedSharedPreferences)
 - 🌓 Dark theme with light theme support (`prefers-color-scheme`)
-- ⌨️ Toggleable Enter=newline mode (Enter inserts a newline, Shift+Enter sends the prompt)
 
 ---
 

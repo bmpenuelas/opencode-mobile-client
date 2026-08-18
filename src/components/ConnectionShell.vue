@@ -262,6 +262,89 @@ function buildToolbarScript(status: string, displayUrl: string): string {
   })()`
 }
 
+function buildMobileComposerFixScript(): string {
+  return `(function(){
+    if(window.__oc_mobileComposerFix)return;
+    window.__oc_mobileComposerFix=true;
+
+    var composerSelector='[data-component="prompt-input-v2"]';
+    var submitSelector='[data-action="prompt-submit"]';
+    var compactWidth=560;
+    var observed=new WeakSet();
+    var refreshQueued=false;
+
+    function installStyle(){
+      if(document.getElementById('oc-mobile-composer-fix-style'))return;
+      var style=document.createElement('style');
+      style.id='oc-mobile-composer-fix-style';
+      style.textContent='[data-component="prompt-input-v2"][data-oc-mobile-composer-compact] [data-oc-mobile-composer-row]{min-width:0!important;min-height:48px!important;height:auto!important;padding:4px 6px 4px 8px!important}[data-component="prompt-input-v2"][data-oc-mobile-composer-compact] [data-oc-mobile-composer-controls]{min-width:0!important;flex:1 1 auto!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x}[data-component="prompt-input-v2"][data-oc-mobile-composer-compact] [data-oc-mobile-composer-controls]::-webkit-scrollbar{display:none}[data-component="prompt-input-v2"][data-oc-mobile-composer-compact] [data-oc-mobile-composer-controls]>*{flex:0 0 auto!important;min-width:max-content}[data-component="prompt-input-v2"][data-oc-mobile-composer-compact] [data-action="prompt-submit"][data-oc-mobile-composer-send]{position:relative!important;z-index:2!important;box-sizing:border-box!important;flex:0 0 40px!important;width:40px!important;min-width:40px!important;height:40px!important;margin-left:4px!important;touch-action:manipulation}';
+      document.head.appendChild(style);
+    }
+
+    function findRow(composer,submit){
+      var row=submit.parentElement;
+      while(row&&row!==composer){
+        var children=Array.prototype.slice.call(row.children);
+        var controls=null;
+        for(var i=0;i<children.length;i++){
+          var child=children[i];
+          if(child!==submit&&!child.contains(submit)){
+            controls=child;
+            break;
+          }
+        }
+        if(controls)return {row:row,controls:controls};
+        row=row.parentElement;
+      }
+      return null;
+    }
+
+    function setCompact(composer){
+      var width=composer.getBoundingClientRect().width;
+      if(width>0&&width<=compactWidth)composer.setAttribute('data-oc-mobile-composer-compact','');
+      else composer.removeAttribute('data-oc-mobile-composer-compact');
+    }
+
+    function patchComposer(composer){
+      var submit=composer.querySelector(submitSelector);
+      if(!submit)return;
+      var layout=findRow(composer,submit);
+      if(!layout)return;
+      layout.row.setAttribute('data-oc-mobile-composer-row','');
+      layout.controls.setAttribute('data-oc-mobile-composer-controls','');
+      submit.setAttribute('data-oc-mobile-composer-send','');
+      setCompact(composer);
+      if(!observed.has(composer)){
+        observed.add(composer);
+        if(window.ResizeObserver){
+          var resizeObserver=new ResizeObserver(function(){setCompact(composer)});
+          resizeObserver.observe(composer);
+        }
+      }
+    }
+
+    function refresh(){
+      var composers=document.querySelectorAll(composerSelector);
+      for(var i=0;i<composers.length;i++)patchComposer(composers[i]);
+    }
+
+    function scheduleRefresh(){
+      if(refreshQueued)return;
+      refreshQueued=true;
+      requestAnimationFrame(function(){refreshQueued=false;refresh()});
+    }
+
+    function mount(){
+      if(!document.head||!document.body){setTimeout(mount,50);return;}
+      installStyle();
+      refresh();
+      var observer=new MutationObserver(scheduleRefresh);
+      observer.observe(document.body,{childList:true,subtree:true});
+    }
+    mount();
+  })();`
+}
+
 function ellipsize(value: string, maxLength = 140): string {
   return value.length > maxLength ? `${value.slice(0, maxLength - 3)}...` : value
 }
@@ -411,6 +494,7 @@ async function openInAppBrowser(): Promise<void> {
   pageLoadedHandle = await InAppBrowser.addListener('browserPageLoaded', async () => {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
+    await InAppBrowser.executeScript({ code: buildMobileComposerFixScript() })
     await InAppBrowser.executeScript({
       code: `(function(){
         var patterns=['Error: ServerSync','Error: Settings context','settings context must be used'];
