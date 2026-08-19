@@ -7,14 +7,14 @@
   <div v-else class="fixed inset-0 flex flex-col items-center justify-center z-[1] bg-background">
     <div v-if="loading" class="flex flex-col items-center gap-4">
       <div class="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-foreground" />
-      <p class="text-sm text-muted-foreground">Loading OpenCode...</p>
+      <p class="text-sm text-muted-foreground">{{ t('connection.loading') }}</p>
     </div>
 
     <div v-else-if="errorText" class="flex flex-col items-center gap-4 text-center max-w-[300px]">
       <p class="text-sm text-muted-foreground leading-relaxed">{{ errorText }}</p>
       <div class="flex gap-2">
-        <Button @click="retry">Retry</Button>
-        <Button variant="outline" @click="goHome">Back</Button>
+        <Button @click="retry">{{ t('common.retry') }}</Button>
+        <Button variant="outline" @click="goHome">{{ t('common.back') }}</Button>
       </div>
     </div>
   </div>
@@ -40,11 +40,13 @@ import {
   getNativeNotificationDecision,
   WEB_NOTIFICATION_MESSAGE_TYPE,
 } from '@/services/platform/nativeNotifications'
+import { useI18n } from '@/i18n'
 
 const route = useRoute()
 const router = useRouter()
 const serverStore = useServerStore()
 const connectionStore = useConnectionStore()
+const { t } = useI18n()
 
 const loading = ref(true)
 const errorText = ref('')
@@ -153,14 +155,14 @@ function buildToolbarScript(status: string, displayUrl: string): string {
   const pulse = status === 'checking' || status === 'reconnecting'
 
   const statusLabel =
-    status === 'connected' ? 'Connected' :
-    status === 'checking' ? 'Checking' :
-    status === 'reconnecting' ? 'Reconnecting' :
-    status === 'disconnected' ? 'Disconnected' :
-    status === 'auth_required' ? 'Auth Required' :
-    status === 'wrong_credentials' ? 'Wrong Credentials' :
-    status === 'unreachable' ? 'Unreachable' :
-    status === 'frame_blocked' ? 'Blocked' :
+    status === 'connected' ? t('status.connected') :
+    status === 'checking' ? t('status.checking') :
+    status === 'reconnecting' ? t('status.reconnecting') :
+    status === 'disconnected' ? t('status.disconnected') :
+    status === 'auth_required' ? t('status.authRequired') :
+    status === 'wrong_credentials' ? t('status.wrongCredentials') :
+    status === 'unreachable' ? t('status.unreachable') :
+    status === 'frame_blocked' ? t('status.blocked') :
     status
 
   const statusLabelLiteral = jsStringLiteral(statusLabel)
@@ -185,10 +187,10 @@ function buildToolbarScript(status: string, displayUrl: string): string {
     panel.appendChild(statusRow);
     var items=document.createElement('div');items.id='oc-panel-items';
     var btns=[
-      {i:'\\u21BB',l:'Refresh',a:'reload'},
-      {i:'\\u2190',l:'Back',a:'back'},
-      {i:'\\u2192',l:'Forward',a:'forward'},
-      {i:'\\u2197',l:'Browser',a:'external'},
+      {i:'\\u21BB',l:${jsStringLiteral(t('common.refresh'))},a:'reload'},
+      {i:'\\u2190',l:${jsStringLiteral(t('common.back'))},a:'back'},
+      {i:'\\u2192',l:${jsStringLiteral(t('menu.forward'))},a:'forward'},
+      {i:'\\u2197',l:${jsStringLiteral(t('menu.browser'))},a:'external'},
     ];
     btns.forEach(function(b){var btn=document.createElement('button');var ico=document.createElement('span');ico.className='oc-ico'+(b.a==='forward'?' oc-ico-sm':'');ico.textContent=b.i;btn.appendChild(ico);var lbl=document.createElement('span');lbl.className='oc-lbl';lbl.textContent=b.l;btn.appendChild(lbl);btn.addEventListener('click',function(){panel.classList.remove('show');switch(b.a){case'external':window.open(window.location.href,'_system');break;case'reload':window.location.reload();break;case'back':window.history.back();break;case'forward':window.history.forward();break}});items.appendChild(btn)});
     var tr=document.createElement('label');tr.id='oc-panel-toggle';
@@ -204,13 +206,13 @@ function buildToolbarScript(status: string, displayUrl: string): string {
     cb.addEventListener('change',function(){localStorage.setItem('oc_enter_newline',cb.checked?'1':'0');sd.classList.toggle('oc-on',cb.checked);});
     tr.appendChild(cb);
     tr.appendChild(sd);
-    var tl=document.createElement('span');tl.className='oc-lbl';tl.textContent='Enter = newline';
+    var tl=document.createElement('span');tl.className='oc-lbl';tl.textContent=${jsStringLiteral(t('menu.enterNewline'))};
     tr.appendChild(tl);
     items.appendChild(tr);
     var btn=document.createElement('button');btn.id='oc-panel-close';
     var ico=document.createElement('span');ico.className='oc-ico';ico.textContent='\\u2716';
     btn.appendChild(ico);
-    var lbl=document.createElement('span');lbl.className='oc-lbl';lbl.textContent='Close';
+    var lbl=document.createElement('span');lbl.className='oc-lbl';lbl.textContent=${jsStringLiteral(t('common.close'))};
     btn.appendChild(lbl);
     btn.addEventListener('click',function(){panel.classList.remove('show');if(window.mobileApp)window.mobileApp.close();});
     items.appendChild(btn);var sp=document.createElement('div');sp.style.height='8px';items.appendChild(sp);
@@ -368,7 +370,7 @@ function buildNotificationApprovalPromptScript(preview: string): string {
     document.head.appendChild(style);
     var modal=document.createElement('div');
     modal.id='oc-notification-permission-modal';
-    modal.innerHTML='<div id="oc-notification-permission-box"><div id="oc-notification-permission-content"><div id="oc-notification-permission-title">OpenCode has emitted a notification</div><div id="oc-notification-permission-message">Would you like to receive OpenCode notifications as native notifications on your phone?</div><div id="oc-notification-permission-preview"></div><div id="oc-notification-permission-foot">You can always change this in Settings.</div></div><div id="oc-notification-permission-actions"><button type="button" data-choice="no">No</button><button type="button" data-choice="yes">Yes</button></div></div>';
+    modal.innerHTML='<div id="oc-notification-permission-box"><div id="oc-notification-permission-content"><div id="oc-notification-permission-title">${t('settings.notifications')}</div><div id="oc-notification-permission-message">${t('settings.notificationDescription')}</div><div id="oc-notification-permission-preview"></div></div><div id="oc-notification-permission-actions"><button type="button" data-choice="no">${t('common.cancel')}</button><button type="button" data-choice="yes">${t('common.confirm')}</button></div></div>';
     modal.querySelector('#oc-notification-permission-preview').textContent=${JSON.stringify(preview)};
     function respond(accepted){
       try{window.mobileApp&&window.mobileApp.postMessage&&window.mobileApp.postMessage({detail:{type:'${WEB_NOTIFICATION_PROMPT_RESPONSE_MESSAGE_TYPE}',accepted:accepted}});}catch(e){}
@@ -430,7 +432,7 @@ onMounted(async () => {
   const connected = await connectionStore.connect(profile.value.id)
   if (!connected) {
     loading.value = false
-    errorText.value = connectionStore.lastError ?? 'Server unreachable'
+    errorText.value = connectionStore.lastError ?? t('connection.unreachable')
     return
   }
 
@@ -564,12 +566,10 @@ async function openInAppBrowser(): Promise<void> {
         },
       } : {}),
     })
-  } catch (error) {
+  } catch {
     removeWebviewListeners()
     loading.value = false
-    errorText.value = error instanceof Error
-      ? `Could not open the web viewer: ${error.message}`
-      : 'Could not open the web viewer.'
+    errorText.value = t('connection.openFailed')
   }
 }
 
@@ -582,7 +582,7 @@ async function openInNewTabFallback(): Promise<void> {
   )
   window.open(url, '_blank')
   loading.value = false
-  errorText.value = 'Opened in a new tab. Close it and return here.'
+  errorText.value = t('connection.opened')
 }
 
 async function retry(): Promise<void> {
@@ -604,7 +604,7 @@ async function retry(): Promise<void> {
     }
   } else {
     loading.value = false
-    errorText.value = connectionStore.lastError ?? 'Server unreachable'
+    errorText.value = connectionStore.lastError ?? t('connection.unreachable')
   }
 }
 

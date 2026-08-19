@@ -1,0 +1,3 @@
+﻿"CFBundleDisplayName" = "OpenCode Mobile";
+"CFBundleName" = "OpenCode Mobile";
+"NSLocalNetworkUsageDescription" = "OpenCode Mobile 会连接到您本地网络中托管的 OpenCode 服务器。";

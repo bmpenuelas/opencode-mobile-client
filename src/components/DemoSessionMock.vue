@@ -3,12 +3,12 @@
     <header class="sticky top-0 z-10 border-b bg-background/95 backdrop-blur px-4 py-3">
       <div class="flex items-center justify-between gap-3">
         <div class="min-w-0">
-          <p class="text-sm font-semibold truncate">OpenCode Demo Session</p>
+          <p class="text-sm font-semibold truncate">{{ t('demo.title') }}</p>
           <p class="text-xs text-muted-foreground truncate">{{ profileName }}</p>
         </div>
         <div class="flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
           <span class="h-2 w-2 rounded-full bg-green-500" />
-          <span>Online</span>
+          <span>{{ t('demo.online') }}</span>
         </div>
       </div>
     </header>
@@ -22,7 +22,7 @@
           :class="message.role === 'user' ? 'ml-8 bg-muted/50' : 'mr-8 bg-card'"
         >
           <div class="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {{ message.role === 'user' ? 'You' : 'OpenCode' }}
+            {{ message.role === 'user' ? t('demo.you') : 'OpenCode' }}
           </div>
           <p class="whitespace-pre-wrap text-sm leading-6">{{ message.content }}</p>
         </div>
@@ -32,14 +32,14 @@
     <footer class="border-t bg-background px-4 py-3">
       <div class="mx-auto flex w-full max-w-3xl flex-col gap-3">
         <div class="rounded-2xl border bg-card px-4 py-3 text-sm text-muted-foreground">
-          Try asking about the repo, debugging an issue, or generating a patch.
+          {{ t('demo.hint') }}
         </div>
         <div class="flex items-end gap-2">
           <textarea
             v-model="draft"
             rows="3"
             class="min-h-24 flex-1 resize-none rounded-2xl border bg-background px-4 py-3 text-sm outline-none"
-            placeholder="Type a demo prompt..."
+            :placeholder="t('demo.placeholder')"
           />
           <button
             type="button"
@@ -47,7 +47,7 @@
             :disabled="!draft.trim()"
             @click="sendDemoMessage"
           >
-            Send
+            {{ t('demo.send') }}
           </button>
         </div>
       </div>
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from '@/i18n'
 
 interface DemoMessage {
   id: string
@@ -67,18 +68,19 @@ interface DemoMessage {
 defineProps<{
   profileName: string
 }>()
+const { t } = useI18n()
 
-const draft = ref('Show me how this app connects to OpenCode.')
+const draft = ref(t('demo.draft'))
 const messages = ref<DemoMessage[]>([
   {
     id: 'assistant-1',
     role: 'assistant',
-    content: 'I traced the connection flow through the mobile client. The app loads the saved server profile, performs a health check, and then opens the session inside the native webview shell.',
+    content: t('demo.welcome'),
   },
   {
     id: 'user-1',
     role: 'user',
-    content: 'Can you inspect the mobile client and summarize how server connection works?',
+    content: t('demo.question'),
   },
   {
     id: 'assistant-2',

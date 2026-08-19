@@ -4,23 +4,23 @@
       <SheetHeader>
         <div class="flex items-center gap-2 mb-1">
           <StatusDot :status="connectionStore.state" />
-          <SheetTitle class="text-base">{{ activeProfile?.name ?? 'Unknown' }}</SheetTitle>
+          <SheetTitle class="text-base">{{ activeProfile?.name ?? t('menu.unknown') }}</SheetTitle>
         </div>
         <SheetDescription class="text-xs break-all">{{ sanitizedUrl }}</SheetDescription>
         <div class="text-xs text-muted-foreground mt-1">{{ statusText }}</div>
       </SheetHeader>
 
       <div class="flex flex-col gap-0.5 mt-4">
-        <Button v-if="connectionStore.state !== 'connected'" variant="ghost" class="justify-start" @click="reconnect">&#x21bb; Reconnect</Button>
-        <Button v-if="connectionStore.isReconnecting" variant="ghost" class="justify-start" @click="cancelReconnect">&#x2715; Cancel Reconnect</Button>
-        <Button variant="ghost" class="justify-start" @click="refreshIframe">&#x21bb; Refresh</Button>
-        <Button variant="ghost" class="justify-start" @click="switchServer">&#x21c4; Switch Server</Button>
-        <Button variant="ghost" class="justify-start" @click="editServer">&#x270e; Edit Current Server</Button>
-        <Button variant="ghost" class="justify-start" @click="manageServers">&#x2630; Manage Servers</Button>
+        <Button v-if="connectionStore.state !== 'connected'" variant="ghost" class="justify-start" @click="reconnect">&#x21bb; {{ t('menu.reconnect') }}</Button>
+        <Button v-if="connectionStore.isReconnecting" variant="ghost" class="justify-start" @click="cancelReconnect">&#x2715; {{ t('menu.cancelReconnect') }}</Button>
+        <Button variant="ghost" class="justify-start" @click="refreshIframe">&#x21bb; {{ t('common.refresh') }}</Button>
+        <Button variant="ghost" class="justify-start" @click="switchServer">&#x21c4; {{ t('menu.switch') }}</Button>
+        <Button variant="ghost" class="justify-start" @click="editServer">&#x270e; {{ t('menu.editCurrent') }}</Button>
+        <Button variant="ghost" class="justify-start" @click="manageServers">&#x2630; {{ t('landing.manageServers') }}</Button>
 
         <Separator class="my-1" />
 
-        <Button variant="ghost" class="justify-start text-destructive hover:text-destructive" @click="disconnect">&#x25c0; Disconnect</Button>
+        <Button variant="ghost" class="justify-start text-destructive hover:text-destructive" @click="disconnect">&#x25c0; {{ t('menu.disconnect') }}</Button>
       </div>
     </SheetContent>
   </Sheet>
@@ -36,10 +36,12 @@ import { useConnectionStore } from '@/stores/connectionStore'
 import { sanitizeUrlForDisplay } from '@/services/opencode/url'
 import type { ServerProfile } from '@/types'
 import StatusDot from './StatusDot.vue'
+import { useI18n } from '@/i18n'
 
 const emit = defineEmits<{ refresh: []; close: [] }>()
 const router = useRouter()
 const connectionStore = useConnectionStore()
+const { t } = useI18n()
 
 const visible = ref(false)
 
@@ -47,9 +49,9 @@ const activeProfile = computed<ServerProfile | null>(() => connectionStore.activ
 const sanitizedUrl = computed(() => activeProfile.value ? sanitizeUrlForDisplay(activeProfile.value.baseUrl) : '')
 const statusText = computed(() => {
   const map: Record<string, string> = {
-    connected: 'Connected', checking: 'Checking...', reconnecting: 'Reconnecting...',
-    disconnected: 'Disconnected', unreachable: 'Unreachable', auth_required: 'Auth required',
-    wrong_credentials: 'Wrong credentials', frame_blocked: 'Frame blocked', idle: 'Idle',
+    connected: t('status.connected'), checking: t('status.checking'), reconnecting: t('status.reconnecting'),
+    disconnected: t('status.disconnected'), unreachable: t('status.unreachable'), auth_required: t('status.authRequired'),
+    wrong_credentials: t('status.wrongCredentials'), frame_blocked: t('status.blocked'), idle: t('status.idle'),
   }
   return map[connectionStore.state] ?? connectionStore.state
 })

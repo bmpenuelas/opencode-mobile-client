@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- The Capacitor web app supplies the UI translations at runtime. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en-US" />
+    <locale android:name="de-DE" />
+    <locale android:name="es-ES" />
+    <locale android:name="fr-FR" />
+    <locale android:name="hi-IN" />
+    <locale android:name="pt-PT" />
+    <locale android:name="ru-RU" />
+    <locale android:name="zh-Hans-CN" />
+</locale-config>

@@ -1,10 +1,10 @@
 <template>
   <div class="min-h-dvh flex flex-col">
     <header class="flex items-center gap-3 px-4 pt-4">
-      <Button variant="ghost" size="icon" @click="goBack" aria-label="Go back">
+      <Button variant="ghost" size="icon" @click="goBack" :aria-label="t('common.back')">
         <ArrowLeft class="h-4 w-4" />
       </Button>
-      <h1 class="text-lg font-semibold">{{ isEdit ? 'Edit Server' : 'Add Server' }}</h1>
+      <h1 class="text-lg font-semibold">{{ isEdit ? t('form.editTitle') : t('form.addTitle') }}</h1>
     </header>
 
     <form novalidate class="flex-1 p-4 flex flex-col overflow-y-auto pb-6" @submit.prevent="handleSubmit">
@@ -12,11 +12,11 @@
       <Card>
         <CardContent class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5">
-            <Label for="name" class="text-center justify-center">Server Name</Label>
-            <Input id="name" v-model="form.name" placeholder="My OpenCode Server" required />
+            <Label for="name" class="text-center justify-center">{{ t('form.name') }}</Label>
+            <Input id="name" v-model="form.name" :placeholder="t('form.namePlaceholder')" required />
           </div>
           <div class="flex flex-col gap-1.5">
-            <Label for="baseUrl" class="text-center justify-center">Server URL</Label>
+            <Label for="baseUrl" class="text-center justify-center">{{ t('form.url') }}</Label>
             <Input id="baseUrl" v-model="form.baseUrl" type="url" placeholder="http://192.168.1.100:4096" inputmode="url" required />
             <p v-if="urlWarning" class="text-xs text-muted-foreground">{{ urlWarning }}</p>
             <p v-if="urlError" class="text-xs text-destructive">{{ urlError }}</p>
@@ -25,7 +25,7 @@
         <CardFooter class="flex-col items-stretch gap-4">
           <div class="flex items-center gap-2">
             <Switch id="auth" v-model="form.authEnabled" />
-            <Label for="auth">Authentication enabled</Label>
+            <Label for="auth">{{ t('form.authentication') }}</Label>
           </div>
           <template v-if="form.authEnabled">
             <div class="flex flex-col gap-1.5">
@@ -35,13 +35,13 @@
               <div class="flex gap-1 items-center">
                 <Input id="password" :type="showPassword ? 'text' : 'password'" v-model="form.password" placeholder="password" class="flex-1" />
                 <Button v-if="form.password" type="button" variant="ghost" size="icon" @click="form.password = ''">&times;</Button>
-                <Button type="button" variant="outline" size="xs" @click="showPassword = !showPassword">{{ showPassword ? 'hide' : 'show' }}</Button>
+                <Button type="button" variant="outline" size="xs" @click="showPassword = !showPassword">{{ showPassword ? t('form.hide') : t('form.show') }}</Button>
               </div>
             </div>
           </template>
           <div class="flex items-center gap-2">
             <Switch id="isDefault" v-model="form.isDefault" />
-            <Label for="isDefault">Set as default server</Label>
+            <Label for="isDefault">{{ t('form.default') }}</Label>
           </div>
         </CardFooter>
       </Card>
@@ -52,7 +52,7 @@
       </div>
 
       <Button type="submit" class="w-full" size="lg" :disabled="saving">
-        {{ saving ? 'Saving...' : (isEdit ? 'Save Changes' : 'Add Server') }}
+        {{ saving ? t('form.saving') : (isEdit ? t('form.saveChanges') : t('form.addTitle')) }}
       </Button>
     </form>
   </div>
@@ -72,10 +72,12 @@ import { useServerStore } from '@/stores/serverStore'
 import { normalizeUrl, validateUrl } from '@/services/opencode/url'
 import { isDemoModeCredentials } from '@/services/opencode/demoMode'
 import type { ServerProfile } from '@/types'
+import { useI18n } from '@/i18n'
 
 const router = useRouter()
 const route = useRoute()
 const serverStore = useServerStore()
+const { t } = useI18n()
 
 const isEdit = computed(() => route.path.includes('/edit'))
 const profileId = computed(() => route.params.id as string)
@@ -107,7 +109,7 @@ watch(() => form.value.baseUrl, () => {
   urlError.value = ''; urlWarning.value = ''
   if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
-  if (!result.valid) urlError.value = result.error ?? 'Invalid URL'
+  if (!result.valid) urlError.value = result.error ?? t('form.invalidUrl')
   else if (result.error) urlWarning.value = result.error
 })
 
@@ -115,7 +117,7 @@ watch(() => [form.value.authEnabled, form.value.username, form.value.password], 
   urlError.value = ''; urlWarning.value = ''
   if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
-  if (!result.valid) urlError.value = result.error ?? 'Invalid URL'
+  if (!result.valid) urlError.value = result.error ?? t('form.invalidUrl')
   else if (result.error) urlWarning.value = result.error
 })
 
@@ -142,11 +144,11 @@ onMounted(async () => {
 
 async function handleSubmit(): Promise<void> {
   formError.value = ''
-  if (!form.value.name.trim()) { formError.value = 'Server name is required'; return }
+  if (!form.value.name.trim()) { formError.value = t('form.nameRequired'); return }
   const demoCredentials = isDemoCredentialsInForm()
   if (!demoCredentials) {
     const urlResult = validateUrl(form.value.baseUrl)
-    if (!urlResult.valid) { formError.value = urlResult.error ?? 'Invalid URL'; return }
+    if (!urlResult.valid) { formError.value = urlResult.error ?? t('form.invalidUrl'); return }
   }
 
   saving.value = true
@@ -169,7 +171,7 @@ async function handleSubmit(): Promise<void> {
       if (form.value.authEnabled && form.value.password) await serverStore.setPassword(profile.id, form.value.password)
     }
     goBack()
-  } catch (err: any) { formError.value = err?.message ?? 'Failed to save server' }
+  } catch (err: any) { formError.value = err?.message ?? t('form.saveFailed') }
   finally { saving.value = false }
 }
 

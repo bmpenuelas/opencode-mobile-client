@@ -1,0 +1,3 @@
+﻿"CFBundleDisplayName" = "OpenCode Mobile";
+"CFBundleName" = "OpenCode Mobile";
+"NSLocalNetworkUsageDescription" = "OpenCode Mobile आपके स्थानीय नेटवर्क पर होस्ट किए गए OpenCode सर्वरों से कनेक्ट होता है।";

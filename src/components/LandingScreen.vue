@@ -24,7 +24,7 @@
             <img src="/opencode-mobile-client-logo-light.svg" alt="OpenCode" class="h-17 mx-auto mb-3" />
           </picture>
           <h1 class="text-2xl font-bold mb-1">OpenCode Mobile &lt;Client&gt;</h1>
-          <p class="text-sm text-muted-foreground">connect to your OpenCode servers on the go</p>
+          <p class="text-sm text-muted-foreground">{{ t('landing.tagline') }}</p>
         </div>
 
         <Card v-if="defaultProfile" class="cursor-pointer" @click="connectDefault" tabindex="0" @keydown.enter="connectDefault">
@@ -34,7 +34,7 @@
               <CardTitle class="text-sm">{{ defaultProfile.name }}</CardTitle>
               <CardDescription class="text-xs break-all">{{ sanitizeUrl(defaultProfile.baseUrl) }}</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" @click.stop="connectDefault" title="Connect"><Play class="fill-current size-3" /></Button>
+            <Button variant="ghost" size="sm" @click.stop="connectDefault" :title="t('landing.connect')"><Play class="fill-current size-3" /></Button>
           </CardContent>
           <CardFooter class="text-xs text-muted-foreground pt-[4.7px] pb-3">
             {{ stateLabel }}
@@ -49,7 +49,7 @@
           @keydown.enter="addServer"
         >
           <CardContent class=" text-center">
-            <p class="text-sm text-muted-foreground">No server configured yet</p>
+            <p class="text-sm text-muted-foreground">{{ t('landing.noServer') }}</p>
           </CardContent>
         </Card>
 
@@ -60,16 +60,16 @@
             class="w-full"
             @click="connectDefault"
           >
-            {{ defaultProfile.authEnabled ? 'Connect & Sign In' : 'Connect' }}
+            {{ defaultProfile.authEnabled ? t('landing.connectSignIn') : t('landing.connect') }}
           </Button>
           <Button variant="outline" @click="addServer" class="mb-8">
-            {{ defaultProfile ? 'Add Another Server' : 'Add OpenCode Server' }}
+            {{ defaultProfile ? t('landing.addAnother') : t('landing.addServer') }}
           </Button>
           <Button variant="ghost" @click="manageServers">
-            Manage Servers
+            {{ t('landing.manageServers') }}
           </Button>
           <Button variant="ghost" @click="openSettings">
-            Settings
+            {{ t('common.settings') }}
           </Button>
         </div>
       </div>
@@ -77,7 +77,7 @@
 
     <div class="flex justify-center pb-6">
       <Button variant="ghost" class="text-muted-foreground" @click="openHelp">
-        Help
+        {{ t('common.help') }}
       </Button>
     </div>
   </div>
@@ -96,10 +96,12 @@ import { configureSystemBars } from '@/services/platform/systemBars'
 import { useServerHealthPoll } from '@/composables/useServerHealthPoll'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
 import StatusDot from './StatusDot.vue'
+import { useI18n } from '@/i18n'
 
 const router = useRouter()
 const serverStore = useServerStore()
 const connectionStore = useConnectionStore()
+const { t } = useI18n()
 
 const poll = useServerHealthPoll()
 
@@ -130,14 +132,14 @@ const canConnect = computed(() => !!defaultProfile.value)
 const stateLabel = computed(() => {
   if (!defaultProfile.value) return ''
   const ls = defaultProfile.value.lastStatus
-  if (ls === 'auth_required') return 'Authentication required'
-  if (ls === 'wrong_credentials') return 'Wrong credentials'
+  if (ls === 'auth_required') return t('status.authRequired')
+  if (ls === 'wrong_credentials') return t('status.wrongCredentials')
   const r = serverStore.reachable[defaultProfile.value.id]
   if (r === true) {
-    if (defaultProfile.value.id === connectionStore.lastWebviewServerId) return 'Connected'
-    return 'Ready to connect'
+    if (defaultProfile.value.id === connectionStore.lastWebviewServerId) return t('status.connected')
+    return t('status.ready')
   }
-  return r === false ? 'Offline' : 'Checking...'
+  return r === false ? t('status.offline') : t('status.checking')
 })
 
 function sanitizeUrl(url: string): string { return sanitizeUrlForDisplay(url) }
