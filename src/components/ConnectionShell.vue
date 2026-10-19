@@ -438,6 +438,50 @@ function buildMobileComposerFixScript(): string {
   })();`
 }
 
+function buildMobileQuestionDockFixScript(): string {
+  // Upstream sizes the question dock to `--question-prompt-max-height`, but only sets it
+  // when the transcript starts with a sticky header; otherwise it falls back to 100dvh and
+  // the dock overflows past the app header, leaving the Submit row off screen.
+  return `(function(){
+    if(window.__oc_mobileQuestionDockFix)return;
+    window.__oc_mobileQuestionDockFix=true;
+
+    function installStyle(){
+      if(document.getElementById('oc-mobile-question-dock-fix-style'))return;
+      var style=document.createElement('style');
+      style.id='oc-mobile-question-dock-fix-style';
+      style.textContent='[data-component="dock-prompt"][data-kind="question"]{max-block-size:min(var(--question-prompt-max-height,100dvh),calc(100dvh - var(--oc-question-dock-top,88px)))!important}';
+      document.head.appendChild(style);
+    }
+
+    function measureTop(){
+      var viewport=document.querySelector('.scroll-view__viewport');
+      var top=viewport?Math.round(viewport.getBoundingClientRect().top):0;
+      if(!(top>0))return;
+      document.documentElement.style.setProperty('--oc-question-dock-top',top+'px');
+    }
+
+    var queued=false;
+    function scheduleMeasure(){
+      if(queued)return;
+      queued=true;
+      requestAnimationFrame(function(){queued=false;measureTop()});
+    }
+
+    function mount(){
+      if(!document.head||!document.body){setTimeout(mount,50);return;}
+      installStyle();
+      measureTop();
+      new MutationObserver(scheduleMeasure).observe(document.body,{childList:true,subtree:true});
+      window.addEventListener('resize',scheduleMeasure);
+      if(window.visualViewport)window.visualViewport.addEventListener('resize',scheduleMeasure);
+      setTimeout(measureTop,250);
+      setTimeout(measureTop,1000);
+    }
+    mount();
+  })();`
+}
+
 function ellipsize(value: string, maxLength = 140): string {
   return value.length > maxLength ? `${value.slice(0, maxLength - 3)}...` : value
 }
@@ -588,6 +632,7 @@ async function openInAppBrowser(): Promise<void> {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
     await InAppBrowser.executeScript({ code: buildMobileComposerFixScript() })
+    await InAppBrowser.executeScript({ code: buildMobileQuestionDockFixScript() })
     await InAppBrowser.executeScript({
       code: `(function(){
         var patterns=['Error: ServerSync','Error: Settings context','settings context must be used'];
