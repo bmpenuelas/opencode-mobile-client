@@ -55,6 +55,15 @@
             </p>
           </div>
         </div>
+        <div class="flex items-start gap-3 mt-5">
+          <Switch id="openLinksInBrowser" v-model="openLinksInBrowser" />
+          <div class="flex flex-col gap-1">
+            <Label for="openLinksInBrowser">{{ t('settings.openLinksInBrowser') }}</Label>
+            <p class="text-xs text-muted-foreground leading-relaxed">
+              {{ t('settings.openLinksInBrowserDescription') }}
+            </p>
+          </div>
+        </div>
       </section>
 
       <section class="mt-auto">
@@ -91,6 +100,7 @@ import {
   isDeviceIntegrationSupported,
   loadDeviceIntegrationSettings,
   setDeviceIntegrationEnabled,
+  setOpenLinksInBrowserEnabled,
 } from '@/services/platform/deviceIntegration'
 import { useI18n, type Locale } from '@/i18n'
 
@@ -103,11 +113,13 @@ const pollMs = ref(connectionStore.healthPollInterval)
 const exponentialReconnect = ref(connectionStore.exponentialReconnectEnabled)
 const notificationsEnabled = ref(false)
 const deviceIntegrationEnabled = ref(true)
+const openLinksInBrowser = ref(true)
 const deviceIntegrationSupported = isDeviceIntegrationSupported()
 
 let notificationsLoaded = false
 let syncingNotificationsSwitch = false
 let deviceIntegrationLoaded = false
+let openLinksInBrowserLoaded = false
 
 watch(locale, (value) => setLocale(value as Locale))
 
@@ -134,6 +146,11 @@ watch(deviceIntegrationEnabled, async (val) => {
   await setDeviceIntegrationEnabled(val)
 })
 
+watch(openLinksInBrowser, async (val) => {
+  if (!openLinksInBrowserLoaded) return
+  await setOpenLinksInBrowserEnabled(val)
+})
+
 onMounted(async () => {
   const settings = await loadNativeNotificationSettings()
   notificationsEnabled.value = settings.enabled
@@ -142,6 +159,8 @@ onMounted(async () => {
   const deviceSettings = await loadDeviceIntegrationSettings()
   deviceIntegrationEnabled.value = deviceSettings.enabled
   deviceIntegrationLoaded = true
+  openLinksInBrowser.value = deviceSettings.openLinksInBrowser
+  openLinksInBrowserLoaded = true
 })
 
 function goBack(): void { router.push('/') }

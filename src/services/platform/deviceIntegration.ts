@@ -9,10 +9,17 @@ export type DeviceIntegrationSettings = {
    * downloads and clipboard writes instead of leaving them inside the WebView.
    */
   enabled: boolean
+  /**
+   * When enabled, links tapped in the embedded OpenCode Web UI that point to
+   * another origin open in the phone's browser instead of navigating inside
+   * the WebView.
+   */
+  openLinksInBrowser: boolean
 }
 
 export const DEFAULT_DEVICE_INTEGRATION_SETTINGS: DeviceIntegrationSettings = {
   enabled: true,
+  openLinksInBrowser: true,
 }
 
 export function isDeviceIntegrationSupported(): boolean {
@@ -28,12 +35,27 @@ export async function loadDeviceIntegrationSettings(): Promise<DeviceIntegration
     return {
       ...DEFAULT_DEVICE_INTEGRATION_SETTINGS,
       enabled: parsed.enabled !== false,
+      openLinksInBrowser: parsed.openLinksInBrowser !== false,
     }
   } catch {
     return { ...DEFAULT_DEVICE_INTEGRATION_SETTINGS }
   }
 }
 
+export async function saveDeviceIntegrationSettings(
+  patch: Partial<DeviceIntegrationSettings>,
+): Promise<void> {
+  const current = await loadDeviceIntegrationSettings()
+  await Preferences.set({
+    key: SETTINGS_KEY,
+    value: JSON.stringify({ ...current, ...patch }),
+  })
+}
+
 export async function setDeviceIntegrationEnabled(enabled: boolean): Promise<void> {
-  await Preferences.set({ key: SETTINGS_KEY, value: JSON.stringify({ enabled }) })
+  await saveDeviceIntegrationSettings({ enabled })
+}
+
+export async function setOpenLinksInBrowserEnabled(openLinksInBrowser: boolean): Promise<void> {
+  await saveDeviceIntegrationSettings({ openLinksInBrowser })
 }

@@ -35,6 +35,7 @@ import { registerBackButton, unregisterBackButton } from '@/services/platform/ba
 import { buildIframeUrl } from '@/services/opencode/url'
 import { isDemoModeServer } from '@/services/opencode/demoMode'
 import { loadDeviceIntegrationSettings } from '@/services/platform/deviceIntegration'
+import { EXTERNAL_LINK_MESSAGE_TYPE, parseExternalLinkUrl } from '@/services/platform/externalLinks'
 import {
   approveNativeNotificationsFromPrompt,
   denyNativeNotificationsFromPrompt,
@@ -151,6 +152,35 @@ function jsStringLiteral(value: string): string {
     .replace(/&/g, '\\u0026')
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029')
+}
+
+function buildExternalLinkScript(): string {
+  return `(function(){
+    if(window.__oc_externalLinks)return;
+    window.__oc_externalLinks=true;
+    var origin=null;
+    try{origin=window.location.origin;}catch(e){}
+    function externalUrl(href){
+      var url;
+      try{url=new URL(href,window.location.href);}catch(e){return null;}
+      if(url.protocol!=='http:'&&url.protocol!=='https:')return null;
+      if(origin&&url.origin===origin)return null;
+      return url.href;
+    }
+    document.addEventListener('click',function(event){
+      if(event.defaultPrevented)return;
+      if(event.button&&event.button!==0)return;
+      var node=event.target;
+      if(!node||typeof node.closest!=='function')return;
+      var anchor=node.closest('a[href]');
+      if(!anchor||anchor.hasAttribute('download'))return;
+      var url=externalUrl(anchor.getAttribute('href')||'');
+      if(!url)return;
+      event.preventDefault();
+      event.stopPropagation();
+      try{window.mobileApp.postMessage({detail:{type:'${EXTERNAL_LINK_MESSAGE_TYPE}',url:url}});}catch(e){}
+    },true);
+  })();`
 }
 
 function buildDeviceClipboardScript(): string {
@@ -609,6 +639,21 @@ function handleDownloadFailed(event: DownloadFailedEvent): void {
   void showDownloadToast(t('connection.downloadFailed', { name }), true)
 }
 
+/**
+ * Opens a tapped external link in the device browser.
+ *
+ * On Android the in-app browser tab is launched in the device's default
+ * browser package (the plugin pins the custom tab when `preventDeeplink` is
+ * set). On iOS the plugin presents its browser sheet over the app.
+ */
+async function openUrlInDefaultBrowser(url: string): Promise<void> {
+  try {
+    await InAppBrowser.open({ url, preventDeeplink: true })
+  } catch {
+    // No browser could handle the link; keep the user in the current session.
+  }
+}
+
 onMounted(async () => {
   await serverStore.load()
   if (!profile.value) { router.push('/'); return }
@@ -659,7 +704,7 @@ async function openInAppBrowser(): Promise<void> {
   const url = isIOS && auth
     ? buildIframeUrl(profile.value!.baseUrl, profile.value!.username, pw!)
     : buildIframeUrl(profile.value!.baseUrl)
-  const { enabled: deviceIntegration } = await loadDeviceIntegrationSettings()
+  const { enabled: deviceIntegration, openLinksInBrowser } = await loadDeviceIntegrationSettings()
 
   browserClosedHandle = await InAppBrowser.addListener('closeEvent', () => {
     connectionStore.disconnect()
@@ -681,13 +726,20 @@ async function openInAppBrowser(): Promise<void> {
 
     if (event.detail?.type === WEB_NOTIFICATION_MESSAGE_TYPE) {
       void handleWebviewNotificationMessage(event.detail)
+      return
     }
+
+    const externalUrl = parseExternalLinkUrl(event.detail)
+    if (externalUrl) void openUrlInDefaultBrowser(externalUrl)
   })
 
   pageLoadedHandle = await InAppBrowser.addListener('browserPageLoaded', async () => {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
     if (deviceIntegration) {
       await InAppBrowser.executeScript({ code: buildDeviceClipboardScript() })
+    }
+    if (openLinksInBrowser) {
+      await InAppBrowser.executeScript({ code: buildExternalLinkScript() })
     }
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
     await InAppBrowser.executeScript({ code: buildMobileComposerFixScript() })

@@ -10,6 +10,7 @@
 - Add the `Enter = newline` toggle for prompt editing.
 - Route downloads through the native device flow via `handleDownloads`, and show a transient in-WebView toast when a download completes or fails.
 - Wrap `navigator.clipboard.writeText` so copy buttons write to the phone clipboard, including servers served over plain HTTP where the Clipboard API is unavailable.
+- Send links tapped in the OpenCode Web UI that point to another origin to the device browser, so they open outside the embedded session.
 - Hide the redundant OpenCode server tab in the embedded mobile UI.
 - Close the mobile sidebar after session navigation.
 
@@ -17,6 +18,7 @@
 
 - The injected script must not log credentials or full credential-bearing URLs.
 - The clipboard bridge only wraps `navigator.clipboard.writeText`; it never reads the clipboard and never sends copied text off the device.
+- The link bridge only forwards the tapped link's own URL to the host app, and only when it is an `http`/`https` address on another origin than the OpenCode server. The host app re-validates the scheme before opening it and never logs the URL.
 - The displayed URL is derived from the configured base URL with the scheme removed; credentials are not included.
 - Dynamic string values are serialized before injection to avoid breaking the script when a user-provided URL contains special characters.
 - No analytics, tracking, crash reporting, or third-party network calls are added by the injected script.
