@@ -14,6 +14,7 @@ Chat with your agents from your phone while they and the server run on your comp
 
 - 🌐 Connect to any OpenCode server over HTTP/HTTPS (LAN or VPN / Tailscale when you're away from home🚶)
 - ⌨️ Toggleable Enter=newline mode (Enter inserts a newline, Shift+Enter sends the prompt)
+- 📥 Files and copied text open on your phone: downloads go to the device and copy buttons write to the phone clipboard (toggle in Settings)
 - 📱 Injects narrow-screen fixes to the stock OpenCode web UI
 - 📋 Multiple server profiles with auto-connect support
 - 🔑 Basic Auth support (matching OpenCode's `OPENCODE_SERVER_PASSWORD`)
