@@ -37,6 +37,11 @@ import { isDemoModeServer } from '@/services/opencode/demoMode'
 import { loadDeviceIntegrationSettings } from '@/services/platform/deviceIntegration'
 import { EXTERNAL_LINK_MESSAGE_TYPE, parseExternalLinkUrl } from '@/services/platform/externalLinks'
 import {
+  buildChatDragBridgeScript,
+  buildDownloadBridgeScript,
+  buildPreviewFixScript,
+} from '@/services/platform/webviewFixes'
+import {
   approveNativeNotificationsFromPrompt,
   denyNativeNotificationsFromPrompt,
   emitNativeNotificationFromWebMessage,
@@ -737,10 +742,13 @@ async function openInAppBrowser(): Promise<void> {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
     if (deviceIntegration) {
       await InAppBrowser.executeScript({ code: buildDeviceClipboardScript() })
+      await InAppBrowser.executeScript({ code: buildDownloadBridgeScript() })
     }
     if (openLinksInBrowser) {
       await InAppBrowser.executeScript({ code: buildExternalLinkScript() })
     }
+    await InAppBrowser.executeScript({ code: buildPreviewFixScript() })
+    await InAppBrowser.executeScript({ code: buildChatDragBridgeScript() })
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
     await InAppBrowser.executeScript({ code: buildMobileComposerFixScript() })
     await InAppBrowser.executeScript({
