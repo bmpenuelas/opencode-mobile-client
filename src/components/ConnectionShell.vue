@@ -26,6 +26,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import DemoSessionMock from '@/components/DemoSessionMock.vue'
 import { InAppBrowser, ToolBarType, BackgroundColor } from '@capgo/capacitor-inappbrowser'
+import type { DownloadCompletedEvent, DownloadFailedEvent } from '@capgo/capacitor-inappbrowser'
 import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'
 import { useServerStore } from '@/stores/serverStore'
@@ -33,6 +34,19 @@ import { useConnectionStore } from '@/stores/connectionStore'
 import { registerBackButton, unregisterBackButton } from '@/services/platform/backButton'
 import { buildIframeUrl } from '@/services/opencode/url'
 import { isDemoModeServer } from '@/services/opencode/demoMode'
+import { loadDeviceIntegrationSettings } from '@/services/platform/deviceIntegration'
+import { EXTERNAL_LINK_MESSAGE_TYPE, parseExternalLinkUrl } from '@/services/platform/externalLinks'
+import {
+  buildChatDragBridgeScript,
+  buildDownloadBridgeScript,
+  buildPreviewFixScript,
+} from '@/services/platform/webviewFixes'
+import {
+  handleDeviceDownloadMessage,
+  parseDeviceDownloadMessage,
+  resetDeviceDownloads,
+  type DeviceDownloadMessage,
+} from '@/services/platform/deviceDownloads'
 import {
   approveNativeNotificationsFromPrompt,
   denyNativeNotificationsFromPrompt,
@@ -59,6 +73,8 @@ let browserClosedHandle: any = null
 let pageLoadedHandle: any = null
 let messageFromWebviewHandle: any = null
 let appStateHandle: any = null
+let downloadCompletedHandle: any = null
+let downloadFailedHandle: any = null
 let notificationPromptResolver: ((value: boolean) => void) | null = null
 let notificationPromptPromise: Promise<boolean> | null = null
 
@@ -67,10 +83,15 @@ function removeWebviewListeners(): void {
   if (pageLoadedHandle) void pageLoadedHandle.remove()
   if (messageFromWebviewHandle) void messageFromWebviewHandle.remove()
   if (appStateHandle) void appStateHandle.remove()
+  if (downloadCompletedHandle) void downloadCompletedHandle.remove()
+  if (downloadFailedHandle) void downloadFailedHandle.remove()
   browserClosedHandle = null
   pageLoadedHandle = null
   messageFromWebviewHandle = null
   appStateHandle = null
+  downloadCompletedHandle = null
+  downloadFailedHandle = null
+  resetDeviceDownloads()
 }
 
 const WEB_NOTIFICATION_PROMPT_RESPONSE_MESSAGE_TYPE = 'opencode:web-notification-prompt-response'
@@ -143,6 +164,111 @@ function jsStringLiteral(value: string): string {
     .replace(/&/g, '\\u0026')
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029')
+}
+
+function buildExternalLinkScript(): string {
+  return `(function(){
+    if(window.__oc_externalLinks)return;
+    window.__oc_externalLinks=true;
+    var origin=null;
+    try{origin=window.location.origin;}catch(e){}
+    function externalUrl(href){
+      var url;
+      try{url=new URL(href,window.location.href);}catch(e){return null;}
+      if(url.protocol!=='http:'&&url.protocol!=='https:')return null;
+      if(origin&&url.origin===origin)return null;
+      return url.href;
+    }
+    document.addEventListener('click',function(event){
+      if(event.defaultPrevented)return;
+      if(event.button&&event.button!==0)return;
+      var node=event.target;
+      if(!node||typeof node.closest!=='function')return;
+      var anchor=node.closest('a[href]');
+      if(!anchor||anchor.hasAttribute('download'))return;
+      var url=externalUrl(anchor.getAttribute('href')||'');
+      if(!url)return;
+      event.preventDefault();
+      event.stopPropagation();
+      try{window.mobileApp.postMessage({detail:{type:'${EXTERNAL_LINK_MESSAGE_TYPE}',url:url}});}catch(e){}
+    },true);
+  })();`
+}
+
+function buildDeviceClipboardScript(): string {
+  return `(function(){
+    if(window.__oc_deviceClipboard)return;
+    window.__oc_deviceClipboard=true;
+    function fallback(text){
+      try{
+        var area=document.createElement('textarea');
+        area.value=text==null?'':String(text);
+        area.setAttribute('readonly','');
+        area.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;';
+        document.body.appendChild(area);
+        var selection=document.getSelection();
+        var previous=selection&&selection.rangeCount>0?selection.getRangeAt(0):null;
+        area.select();
+        area.setSelectionRange(0,area.value.length);
+        var copied=false;
+        try{copied=document.execCommand('copy');}catch(e){copied=false;}
+        document.body.removeChild(area);
+        if(previous){selection.removeAllRanges();selection.addRange(previous);}
+        return copied;
+      }catch(e){return false;}
+    }
+    var nativeWrite=null;
+    try{
+      if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){
+        nativeWrite=navigator.clipboard.writeText.bind(navigator.clipboard);
+      }
+    }catch(e){}
+    var api=navigator.clipboard||{};
+    api.writeText=function(text){
+      if(nativeWrite){
+        try{
+          return Promise.resolve(nativeWrite(text)).catch(function(){
+            if(fallback(text))return;
+            throw new Error('clipboard write failed');
+          });
+        }catch(e){}
+      }
+      return fallback(text)?Promise.resolve():Promise.reject(new Error('clipboard write failed'));
+    };
+    try{Object.defineProperty(navigator,'clipboard',{configurable:true,get:function(){return api;}});}
+    catch(e){try{navigator.clipboard=api;}catch(_){}}
+  })();`
+}
+
+function buildDownloadToastScript(message: string, isError: boolean): string {
+  const messageLiteral = jsStringLiteral(message)
+  const background = isError ? 'rgba(120,24,24,.96)' : 'rgba(28,28,30,.96)'
+  return `(function(){
+    var id='oc-device-toast';
+    var old=document.getElementById(id);
+    if(old)old.remove();
+    var style=document.getElementById('oc-device-toast-style');
+    if(!style){
+      style=document.createElement('style');
+      style.id='oc-device-toast-style';
+      style.textContent='#oc-device-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:2147483647;max-width:82vw;padding:9px 14px;border-radius:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;line-height:1.35;color:#fff;background:${background};box-shadow:0 8px 28px rgba(0,0,0,.45);transition:opacity .4s ease;word-break:break-word;}';
+      document.head.appendChild(style);
+    }
+    var toast=document.createElement('div');
+    toast.id=id;
+    toast.textContent=${messageLiteral};
+    document.body.appendChild(toast);
+    setTimeout(function(){toast.style.opacity='0';},2600);
+    setTimeout(function(){if(toast.parentNode)toast.parentNode.removeChild(toast);},3200);
+  })();`
+}
+
+async function showDownloadToast(message: string, isError: boolean): Promise<void> {
+  try {
+    await InAppBrowser.executeScript({ code: buildDownloadToastScript(message, isError) })
+  } catch {
+    // The web view may already be closing; there is nothing useful to do here.
+  }
 }
 
 function buildToolbarScript(status: string, displayUrl: string): string {
@@ -515,6 +641,46 @@ async function handleWebviewNotificationMessage(detail: unknown): Promise<void> 
   await emitNativeNotificationFromWebMessage(detail, profile.value?.name ?? 'OpenCode')
 }
 
+function handleDownloadCompleted(event: DownloadCompletedEvent): void {
+  const name = event.fileName || t('common.file')
+  void showDownloadToast(t('connection.downloaded', { name }), false)
+}
+
+function handleDownloadFailed(event: DownloadFailedEvent): void {
+  const name = event.fileName || t('common.file')
+  void showDownloadToast(t('connection.downloadFailed', { name }), true)
+}
+
+/**
+ * Saves a file streamed from the WebView and opens the share sheet so the user
+ * picks where it goes (Files, Drive, a chat app, ...). This is the path used for
+ * `<a download>` clicks; it replaces the plugin's in-WebView text preview.
+ */
+async function handleDeviceDownload(message: DeviceDownloadMessage): Promise<void> {
+  try {
+    const result = await handleDeviceDownloadMessage(message)
+    if (!result) return
+    void showDownloadToast(t('connection.downloadReady', { name: result.fileName }), false)
+  } catch {
+    void showDownloadToast(t('connection.downloadFailed', { name: t('common.file') }), true)
+  }
+}
+
+/**
+ * Opens a tapped external link in the device browser.
+ *
+ * On Android the in-app browser tab is launched in the device's default
+ * browser package (the plugin pins the custom tab when `preventDeeplink` is
+ * set). On iOS the plugin presents its browser sheet over the app.
+ */
+async function openUrlInDefaultBrowser(url: string): Promise<void> {
+  try {
+    await InAppBrowser.open({ url, preventDeeplink: true })
+  } catch {
+    // No browser could handle the link; keep the user in the current session.
+  }
+}
+
 onMounted(async () => {
   await serverStore.load()
   if (!profile.value) { router.push('/'); return }
@@ -565,6 +731,7 @@ async function openInAppBrowser(): Promise<void> {
   const url = isIOS && auth
     ? buildIframeUrl(profile.value!.baseUrl, profile.value!.username, pw!)
     : buildIframeUrl(profile.value!.baseUrl)
+  const { enabled: deviceIntegration, openLinksInBrowser } = await loadDeviceIntegrationSettings()
 
   browserClosedHandle = await InAppBrowser.addListener('closeEvent', () => {
     connectionStore.disconnect()
@@ -572,6 +739,11 @@ async function openInAppBrowser(): Promise<void> {
     resolveNotificationPrompt(false)
     router.push('/')
   })
+
+  if (deviceIntegration) {
+    downloadCompletedHandle = await InAppBrowser.addListener('downloadCompleted', handleDownloadCompleted)
+    downloadFailedHandle = await InAppBrowser.addListener('downloadFailed', handleDownloadFailed)
+  }
 
   messageFromWebviewHandle = await InAppBrowser.addListener('messageFromWebview', (event) => {
     if (event.detail?.type === WEB_NOTIFICATION_PROMPT_RESPONSE_MESSAGE_TYPE) {
@@ -581,11 +753,30 @@ async function openInAppBrowser(): Promise<void> {
 
     if (event.detail?.type === WEB_NOTIFICATION_MESSAGE_TYPE) {
       void handleWebviewNotificationMessage(event.detail)
+      return
     }
+
+    const download = parseDeviceDownloadMessage(event.detail)
+    if (download) {
+      void handleDeviceDownload(download)
+      return
+    }
+
+    const externalUrl = parseExternalLinkUrl(event.detail)
+    if (externalUrl) void openUrlInDefaultBrowser(externalUrl)
   })
 
   pageLoadedHandle = await InAppBrowser.addListener('browserPageLoaded', async () => {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
+    if (deviceIntegration) {
+      await InAppBrowser.executeScript({ code: buildDeviceClipboardScript() })
+      await InAppBrowser.executeScript({ code: buildDownloadBridgeScript() })
+    }
+    if (openLinksInBrowser) {
+      await InAppBrowser.executeScript({ code: buildExternalLinkScript() })
+    }
+    await InAppBrowser.executeScript({ code: buildPreviewFixScript() })
+    await InAppBrowser.executeScript({ code: buildChatDragBridgeScript() })
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl) })
     await InAppBrowser.executeScript({ code: buildMobileComposerFixScript() })
     await InAppBrowser.executeScript({
@@ -647,6 +838,7 @@ async function openInAppBrowser(): Promise<void> {
       enabledSafeBottomMargin: true,
       disableOverscroll: true,
       activeNativeNavigationForWebview: true,
+      handleDownloads: deviceIntegration,
       isPresentAfterPageLoad: true,
       preShowScriptInjectionTime: 'documentStart',
       preShowScript: buildNotificationBridgeScript(),
