@@ -42,6 +42,12 @@ import {
   buildPreviewFixScript,
 } from '@/services/platform/webviewFixes'
 import {
+  handleDeviceDownloadMessage,
+  parseDeviceDownloadMessage,
+  resetDeviceDownloads,
+  type DeviceDownloadMessage,
+} from '@/services/platform/deviceDownloads'
+import {
   approveNativeNotificationsFromPrompt,
   denyNativeNotificationsFromPrompt,
   emitNativeNotificationFromWebMessage,
@@ -85,6 +91,7 @@ function removeWebviewListeners(): void {
   appStateHandle = null
   downloadCompletedHandle = null
   downloadFailedHandle = null
+  resetDeviceDownloads()
 }
 
 const WEB_NOTIFICATION_PROMPT_RESPONSE_MESSAGE_TYPE = 'opencode:web-notification-prompt-response'
@@ -645,6 +652,21 @@ function handleDownloadFailed(event: DownloadFailedEvent): void {
 }
 
 /**
+ * Saves a file streamed from the WebView and opens the share sheet so the user
+ * picks where it goes (Files, Drive, a chat app, ...). This is the path used for
+ * `<a download>` clicks; it replaces the plugin's in-WebView text preview.
+ */
+async function handleDeviceDownload(message: DeviceDownloadMessage): Promise<void> {
+  try {
+    const result = await handleDeviceDownloadMessage(message)
+    if (!result) return
+    void showDownloadToast(t('connection.downloadReady', { name: result.fileName }), false)
+  } catch {
+    void showDownloadToast(t('connection.downloadFailed', { name: t('common.file') }), true)
+  }
+}
+
+/**
  * Opens a tapped external link in the device browser.
  *
  * On Android the in-app browser tab is launched in the device's default
@@ -731,6 +753,12 @@ async function openInAppBrowser(): Promise<void> {
 
     if (event.detail?.type === WEB_NOTIFICATION_MESSAGE_TYPE) {
       void handleWebviewNotificationMessage(event.detail)
+      return
+    }
+
+    const download = parseDeviceDownloadMessage(event.detail)
+    if (download) {
+      void handleDeviceDownload(download)
       return
     }
 

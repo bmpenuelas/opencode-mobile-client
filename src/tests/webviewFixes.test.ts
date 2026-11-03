@@ -3,6 +3,7 @@ import {
   buildChatDragBridgeScript,
   buildDownloadBridgeScript,
   buildPreviewFixScript,
+  DEVICE_DOWNLOAD_MESSAGE_TYPE,
   guessDownloadMime,
   RAW_FILE_ROUTE,
 } from '@/services/platform/webviewFixes'
@@ -37,19 +38,24 @@ describe('download bridge script', () => {
     expect(script).toContain('__oc_downloadBridge')
   })
 
-  it('keeps object URLs alive past the native download read', () => {
-    expect(script).toContain('URL.revokeObjectURL')
-    expect(script).toContain('setTimeout')
+  it('streams the file to the host so it can be saved and shared', () => {
+    expect(script).toContain(DEVICE_DOWNLOAD_MESSAGE_TYPE)
+    expect(script).toContain('postMessage')
+    expect(script).toContain("phase:'start'")
+    expect(script).toContain("phase:'chunk'")
+    expect(script).toContain("phase:'finish'")
+    expect(script).toContain('FileReader')
   })
 
-  it('re-issues blob downloads from a visible, typed anchor', () => {
+  it('intercepts download anchors and keeps a native fallback', () => {
     expect(script).toContain('HTMLAnchorElement.prototype.click')
     expect(script).toContain('data-oc-device-download')
-    expect(script).toContain('mimeFor')
+    expect(script).toContain('fallback')
   })
 
-  it('embeds the MIME guesser source so the WebView can run it', () => {
-    expect(script).toContain('function guessDownloadMime')
+  it('only takes over same-origin or blob links', () => {
+    expect(script).toContain('sameOrigin')
+    expect(script).toContain("href.slice(0,5)==='blob:'")
   })
 })
 
@@ -63,11 +69,17 @@ describe('preview fix script', () => {
   it('repoints sandboxed blob previews at the raw file route', () => {
     expect(script).toContain(RAW_FILE_ROUTE)
     expect(script).toContain("src.slice(0,5)!=='blob:'")
-    expect(script).toContain("iframe[sandbox]")
-    expect(script).toContain("data-slot=\"artifact-filename\"")
+    expect(script).toContain('iframe[sandbox]')
+    expect(script).toContain('data-slot="artifact-filename"')
   })
 
-  it('requires HTML content before swapping the frame', () => {
+  it('keeps the directory in the URL so relative assets resolve', () => {
+    expect(script).toContain("split('/')")
+    expect(script).toContain('encodeURIComponent')
+  })
+
+  it('allows same-origin assets and fonts, and requires HTML before swapping', () => {
+    expect(script).toContain('allow-same-origin')
     expect(script).toContain('text/html')
     expect(script).toContain("credentials:'same-origin'")
   })

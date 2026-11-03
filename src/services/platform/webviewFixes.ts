@@ -10,12 +10,17 @@
  *   parse on every Android/iOS WebView the app supports.
  */
 
+/** Message type used by the download bridge to hand a file to the host. */
+export const DEVICE_DOWNLOAD_MESSAGE_TYPE = 'opencode:device-download'
+
+/** Route OpenCode Web serves a raw workspace file from, used by the preview fix. */
+export const RAW_FILE_ROUTE = '/api/fs/read/'
+
 /**
  * MIME type for a downloaded file name.
  *
- * This function is embedded verbatim into the injected download bridge through
- * `Function.prototype.toString()`, so it must stay self-contained: no imports, no
- * closures, and no syntax newer than the WebViews the app supports.
+ * Kept self-contained so the host can call it and so the download bridge can
+ * embed its source in a WebView when needed.
  */
 export function guessDownloadMime(fileName: unknown): string {
   const name = String(fileName == null ? '' : fileName)
@@ -91,65 +96,77 @@ export function guessDownloadMime(fileName: unknown): string {
   return types[extension] || 'application/octet-stream'
 }
 
-/** Route OpenCode Web serves a raw workspace file from, used by the preview fix. */
-export const RAW_FILE_ROUTE = '/api/fs/read/'
-
 /**
  * Download bridge.
  *
- * OpenCode Web saves files by clicking a detached `<a download>` whose `href` is a
- * `blob:` URL created with `application/octet-stream`, then immediately calling
- * `URL.revokeObjectURL`. The native download handler therefore cannot read the
- * blob, cannot see the intended filename (it falls back to Android's
- * `downloadfile.bin`), and saves an untyped file that no viewer can open.
+ * OpenCode Web saves a file by clicking a detached `<a download>` whose `href` is
+ * a `blob:` URL, then immediately revoking it. The native InAppBrowser handler
+ * saves that blob but, for text types such as `text/html`, only "previews" it
+ * inside the WebView (and it guesses `downloadfile.bin` when it cannot read the
+ * name), so the file never actually reaches the device.
  *
- * The bridge keeps object URLs alive long enough for the native handler to read
- * them, and re-issues `blob:` downloads from a visible anchor typed from the file
- * extension, so the saved file keeps its real name and MIME type.
+ * The bridge reads the bytes in the page and streams them to the host in chunks,
+ * which saves the real file and opens the device share sheet so the user picks
+ * where it goes. Mouse/native downloads and non-anchor downloads are untouched.
  */
 export function buildDownloadBridgeScript(): string {
   return `(function(){
     if(window.__oc_downloadBridge)return;
     window.__oc_downloadBridge=true;
 
-    var mimeFor=${guessDownloadMime.toString()};
+    var messageType=${JSON.stringify(DEVICE_DOWNLOAD_MESSAGE_TYPE)};
+    var CHUNK=512*1024;
+    var MAX_BYTES=64*1024*1024;
+    var counter=0;
 
-    // The save flow revokes its object URL before the native handler can read it.
-    try{
-      var revoke=URL.revokeObjectURL.bind(URL);
-      URL.revokeObjectURL=function(url){
-        setTimeout(function(){try{revoke(url)}catch(e){}},60000);
-      };
-    }catch(e){}
-
-    function reissue(anchor,href,name,fallback){
-      try{
-        fetch(href).then(function(response){return response.blob()}).then(function(blob){
-          var typed=new Blob([blob],{type:mimeFor(name)});
-          var url=URL.createObjectURL(typed);
-          var next=document.createElement('a');
-          next.href=url;
-          next.download=name;
-          next.setAttribute('data-oc-device-download','');
-          next.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;';
-          document.body.appendChild(next);
-          next.click();
-          setTimeout(function(){try{next.remove()}catch(e){}},120000);
-        }).catch(function(){try{fallback()}catch(e){}});
-      }catch(e){try{fallback()}catch(_){}}
+    function post(payload){
+      var app=window.mobileApp;
+      if(!app||typeof app.postMessage!=='function')return false;
+      try{app.postMessage({detail:payload});return true;}catch(e){return false;}
     }
 
-    // The save flow clicks a detached anchor, so the native handler cannot read
-    // its filename. Re-dispatch blob downloads from an anchor held in the DOM.
+    function sameOrigin(href){
+      try{return new URL(href,window.location.href).origin===window.location.origin;}catch(e){return false;}
+    }
+
+    function send(href,name,fallback){
+      var id='dl-'+Date.now()+'-'+(++counter);
+      fetch(href).then(function(response){
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        return response.blob();
+      }).then(function(blob){
+        if(blob.size>MAX_BYTES)throw new Error('download too large');
+        if(!post({type:messageType,phase:'start',id:id,fileName:name,mimeType:blob.type||'',size:blob.size}))throw new Error('bridge unavailable');
+        var offset=0;
+        function next(){
+          if(offset>=blob.size){post({type:messageType,phase:'finish',id:id});return;}
+          var slice=blob.slice(offset,offset+CHUNK);
+          offset+=slice.size;
+          var reader=new FileReader();
+          reader.onloadend=function(){
+            var data=String(reader.result||'').split(',').pop()||'';
+            post({type:messageType,phase:'chunk',id:id,base64:data});
+            next();
+          };
+          reader.onerror=function(){post({type:messageType,phase:'error',id:id,message:'read failed'});};
+          reader.readAsDataURL(slice);
+        }
+        next();
+      }).catch(function(){try{fallback();}catch(e){}});
+    }
+
     try{
       var click=HTMLAnchorElement.prototype.click;
       HTMLAnchorElement.prototype.click=function(){
         try{
           var href=this.getAttribute&&this.getAttribute('href');
-          if(this.hasAttribute&&this.hasAttribute('download')&&href&&href.slice(0,5)==='blob:'&&!this.hasAttribute('data-oc-device-download')){
-            var self=this;
-            reissue(self,self.href,self.getAttribute('download')||'download',function(){click.call(self)});
-            return;
+          if(this.hasAttribute&&this.hasAttribute('download')&&href&&!this.hasAttribute('data-oc-device-download')){
+            var absolute=this.href;
+            if(href.slice(0,5)==='blob:'||sameOrigin(absolute)){
+              var self=this;
+              send(absolute,this.getAttribute('download')||'download',function(){click.call(self);});
+              return;
+            }
           }
         }catch(e){}
         return click.apply(this,arguments);
@@ -164,17 +181,18 @@ export function buildDownloadBridgeScript(): string {
  * The file explorer previews HTML in a sandboxed `<iframe>` whose `src` is a
  * `blob:` URL. Two things break that on mobile:
  *
- * 1. Some Android WebView builds refuse to load a `blob:` document in an
- *    iframe (the frame stays blank).
- * 2. A `blob:` document inherits the embedding page's CSP, so the strict
+ * 1. A `blob:` document inherits the embedding page's CSP, so the strict
  *    `script-src 'self'` served by OpenCode Web blocks inline scripts in the
- *    previewed file, making script-driven pages render blank.
+ *    previewed file (script-driven pages stay blank).
+ * 2. Relative URLs inside a blob document resolve against the blob URL, so the
+ *    preview's CSS, images and fonts never load. Some Android WebViews also
+ *    refuse a `blob:` frame outright.
  *
  * The bridge repoints the frame at the server's raw file route
- * (`/api/fs/read/<path>`), which serves the bytes directly as an HTTP document
- * with no inherited policy, while keeping the sandbox. The path is read from the
- * artifact toolbar rendered next to the frame. Frames are only repointed after a
- * successful same-origin fetch, so a wrong guess leaves the original preview.
+ * (`/api/fs/read/<path>`). It is served as a normal HTTP document with no
+ * inherited policy, its URL keeps the file's directory so relative assets
+ * resolve, and `allow-same-origin` lets same-origin fonts load. The sandbox is
+ * kept, so the preview still cannot reach into the app.
  */
 export function buildPreviewFixScript(): string {
   return `(function(){
@@ -190,8 +208,12 @@ export function buildPreviewFixScript(): string {
       return String(label.getAttribute('title')||label.textContent||'').trim();
     }
 
+    // Keep the directory in the URL so relative assets resolve against it, and
+    // encode only the segments (not the separators).
     function rawUrl(path){
-      return rawRoute+encodeURIComponent(path);
+      var segments=String(path).replace(/^\\/+/, '').split('/');
+      for(var i=0;i<segments.length;i++)segments[i]=encodeURIComponent(segments[i]);
+      return rawRoute+segments.join('/');
     }
 
     function fix(frame){
@@ -209,6 +231,8 @@ export function buildPreviewFixScript(): string {
         var type=(response.headers.get('content-type')||'').toLowerCase();
         if(type.indexOf('text/html')<0)throw new Error('not markup');
         if(frame.getAttribute('data-oc-preview-fixed')!==url)return;
+        var sandbox=frame.getAttribute('sandbox')||'';
+        if(sandbox.indexOf('allow-same-origin')<0)frame.setAttribute('sandbox',(sandbox+' allow-same-origin').trim());
         frame.setAttribute('src',url);
       }).catch(function(){});
     }

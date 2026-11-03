@@ -14,8 +14,8 @@ Chat with your agents from your phone while they and the server run on your comp
 
 - 🌐 Connect to any OpenCode server over HTTP/HTTPS (LAN or VPN / Tailscale when you're away from home🚶)
 - ⌨️ Toggleable Enter=newline mode (Enter inserts a newline, Shift+Enter sends the prompt)
-- 📥 Files and copied text open on your phone: downloads go to the device and copy buttons write to the phone clipboard (toggle in Settings)
-- 🖼️ HTML files preview correctly in the file explorer, including script-driven pages
+- 📥 Files and copied text open on your phone: downloads are saved on the device and the share sheet lets you pick where they go, while copy buttons write to the phone clipboard (toggle in Settings)
+- 🖼️ HTML files preview correctly in the file explorer, with their inline scripts, CSS, images and fonts
 - 👆 Long-press a file in the explorer to drag it into the chat on touch screens
 - 🔗 External links open in your phone's browser instead of navigating inside the session (toggle in Settings)
 - 📱 Injects narrow-screen fixes to the stock OpenCode web UI
