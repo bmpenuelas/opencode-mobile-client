@@ -34,4 +34,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- CAMERA would otherwise imply a required camera and hide the app from devices without one. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>

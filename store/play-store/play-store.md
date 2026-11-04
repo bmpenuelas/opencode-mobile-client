@@ -55,10 +55,12 @@ When auth is enabled, the username defaults to opencode in the app.
 - User-provided server URLs/usernames are stored locally on device.
 - Passwords are stored locally using Android secure storage.
 - Network traffic goes only to OpenCode servers configured by the user.
+- Photos and videos: not collected. The camera reads the pairing QR code on the device, and images are not saved or sent anywhere.
 
 ## Review notes
 
 - `INTERNET` permission is required to connect to user-configured OpenCode servers.
+- `CAMERA` permission is used when the user taps **Scan QR code** to pair with a server, and for photos attached through a file input in the OpenCode Web UI. The camera is optional, so devices without one can still install the app and paste a link.
 - Cleartext HTTP is supported for local/private and VPN/Tailscale servers; public/VPS servers should use HTTPS.
 - The app warns about public HTTP but does not block it to avoid breaking user-controlled deployments.
 - WebView script injection is limited to mobile controls and keyboard behavior for the user-selected OpenCode Web UI.

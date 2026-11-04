@@ -38,6 +38,10 @@ This project intentionally supports user-provided OpenCode servers:
    - The privacy policy currently states there is no third-party crash reporting, analytics, advertising, or tracking SDK.
    - Adding Sentry, Firebase Crashlytics, or similar requires updating this policy plus App Store / Play disclosures.
 
+5. **ML Kit is excluded on Android**
+   - `@capacitor/barcode-scanner` depends on ML Kit, which reports usage to Google. The app excludes it in `android/app/build.gradle` and decodes QR codes with ZXing, so the privacy policy and Data Safety answers stay accurate.
+   - Removing that exclusion or switching the scanner to ML Kit requires updating this policy plus Play disclosures.
+
 ## Manual release checklist
 
 - Run `npm run store:verify`.

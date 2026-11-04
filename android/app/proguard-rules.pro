@@ -18,3 +18,9 @@
 
 # Preserve line numbers for crash stack traces
 -keepattributes SourceFile,LineNumberTable
+
+# ML Kit is excluded in build.gradle, along with what it brought in. The barcode library only
+# reaches these when asked to use ML Kit, apart from an annotation that nothing reads at runtime.
+-dontwarn com.google.mlkit.**
+-dontwarn com.google.android.gms.tasks.**
+-dontwarn com.google.gson.annotations.SerializedName

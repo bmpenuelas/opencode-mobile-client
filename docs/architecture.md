@@ -110,6 +110,16 @@ Minting a code for each launch means the webview needs nothing from an earlier l
 
 `paired` records that the stored secret is a token rather than a typed password, so it is never shown in the form and only tokens get renewed.
 
+### QR Scanning
+
+On native platforms the pairing field offers **Scan QR code**. `scanQrCode()` in `services/platform/qrScanner.ts` opens the full-screen scanner from `@capacitor/barcode-scanner`, and the form puts the text into `form.pairingLink` if `parsePairingLink` accepts it.
+
+- **No JS import.** The service reaches the native plugin through `registerPlugin`. Importing the package would add a 370 KB web decoder to the startup bundle, for a code path that only runs natively.
+- **ZXing on Android, not ML Kit.** ML Kit [reports usage to Google](https://developers.google.com/ml-kit/android-data-disclosure) with no documented way to turn that off, which the privacy policy rules out. `android/app/build.gradle` excludes it from the app, and `proguard-rules.pro` silences R8 about the plugin code that would only run with ML Kit. iOS uses Apple Vision.
+- **Light terminals on Android.** `opencode pair` draws dark modules as the terminal background, so a light theme gives a light-on-dark code. The plugin gives ZXing no way to read those, so nothing is detected and the user has to paste a link.
+
+After upgrading the plugin, scan a code with a release build. A new version could reach ML Kit from the ZXing path, which would only fail at runtime.
+
 ### Health Check
 
 On v2 servers, the check is an authenticated `GET /api/info` instead. A response that isn't JSON with a `version`, or a 404, gives the `incompatible` status, which tells the user to mark the server as v1.
@@ -228,10 +238,12 @@ getSecretStorage():
 - Cleartext HTTP via network security config
 - Capacitor back button handler
 - SystemBars for status/navigation bar styling
+- `CAMERA` permission for QR scanning, with the camera feature marked optional
 
 ### iOS
 
 - ATS configured for local networking (`NSAllowsLocalNetworking`)
+- `NSCameraUsageDescription` for QR scanning
 - Safe area via `viewport-fit=cover` + `env(safe-area-inset-*)` CSS
 - `apple-mobile-web-app-status-bar-style: black-translucent`
 

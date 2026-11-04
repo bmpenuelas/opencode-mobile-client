@@ -18,6 +18,10 @@
           <div v-if="usesPairing" class="flex flex-col gap-1.5">
             <Label for="pairingLink" class="text-center justify-center">{{ t('form.pairingLink') }}</Label>
             <Input id="pairingLink" v-model="form.pairingLink" placeholder="http://192.168.1.100:49374/auth/connect/…" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" />
+            <Button v-if="canScan" type="button" variant="outline" :disabled="scanning" @click="scanPairingCode">
+              <QrCode class="h-4 w-4" />
+              {{ t('form.scanQr') }}
+            </Button>
             <p class="text-xs text-muted-foreground">{{ pairingHint }}</p>
           </div>
           <div v-else class="flex flex-col gap-1.5">
@@ -73,7 +77,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft } from '@lucide/vue'
+import { ArrowLeft, QrCode } from '@lucide/vue'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -84,6 +88,7 @@ import { useServerStore } from '@/stores/serverStore'
 import { normalizeUrl, sanitizeUrlForDisplay, validateUrl } from '@/services/opencode/url'
 import { isLoopbackLink, parsePairingLink, redeemPairingLink, V2_USERNAME } from '@/services/opencode/pairing'
 import { isDemoModeCredentials } from '@/services/opencode/demoMode'
+import { canScanQrCode, scanQrCode } from '@/services/platform/qrScanner'
 import type { ServerProfile } from '@/types'
 import { useI18n } from '@/i18n'
 
@@ -109,13 +114,15 @@ const form = ref({
   pairingLink: '',
 })
 
+const canScan = canScanQrCode()
 const usesPairing = computed(() => !form.value.legacyV1 && !form.value.manual)
 const pairingHint = computed(() => editedProfile.value?.paired
   ? t('form.pairingKeep', { url: sanitizeUrlForDisplay(editedProfile.value.baseUrl) })
-  : t('form.pairingHint'))
+  : t(canScan ? 'form.pairingHintScan' : 'form.pairingHint'))
 
 const showPassword = ref(false)
 const saving = ref(false)
+const scanning = ref(false)
 const formError = ref('')
 const urlError = ref('')
 const urlWarning = ref('')
@@ -165,6 +172,20 @@ onMounted(async () => {
     form.value.isDefault = false
   }
 })
+
+async function scanPairingCode(): Promise<void> {
+  formError.value = ''
+  scanning.value = true
+  try {
+    const result = await scanQrCode(t('form.scanInstructions'))
+    if (result.type === 'denied') formError.value = t('form.scanDenied')
+    else if (result.type === 'failed') formError.value = t('form.scanFailed')
+    else if (result.type === 'scanned') {
+      if (parsePairingLink(result.text)) form.value.pairingLink = result.text
+      else formError.value = t('form.scanInvalid')
+    }
+  } finally { scanning.value = false }
+}
 
 type Connection = Pick<ServerProfile, 'baseUrl' | 'authEnabled' | 'username' | 'paired'>
 

@@ -41,6 +41,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>OpenCode Mobile uses the camera to scan the QR code from “opencode pair”, and to take photos you attach in the OpenCode web UI.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>OpenCode Mobile connects to OpenCode servers hosted on your local network.</string>
 	<key>UILaunchStoryboardName</key>

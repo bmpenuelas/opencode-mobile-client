@@ -116,3 +116,4 @@ This app is a client. So for regular use, it connects to an OpenCode server that
 - Third-party analytics: no.
 - Crash reporting: no third-party crash reporting SDK by default.
 - Data stored locally: server profile names, URLs, usernames, and passwords in platform secure storage.
+- Camera: used when the user taps **Scan QR code** to pair with a server, and for photos attached through a file input in the OpenCode Web UI. The QR code is read on the device, and images are not saved or sent anywhere, so this adds no data type to the App Privacy answers.

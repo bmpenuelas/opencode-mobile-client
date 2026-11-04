@@ -164,6 +164,12 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
 }
 
+// The QR scanner decodes with ZXing. ML Kit comes along with the plugin but reports usage
+// to Google, which the privacy policy rules out, so it stays out of the app. See docs/architecture.md.
+configurations.configureEach {
+    exclude group: 'com.google.mlkit'
+}
+
 apply from: 'capacitor.build.gradle'
 
 try {

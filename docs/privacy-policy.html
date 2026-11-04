@@ -181,7 +181,7 @@
         <a href="index.html" class="back">&larr; Home</a>
       </header>
 
-      <p class="meta"><strong>Last updated:</strong> June 18, 2026</p>
+      <p class="meta"><strong>Last updated:</strong> November 4, 2026</p>
 
       <p>
         This privacy policy applies to the
@@ -228,11 +228,15 @@
           servers over the network.
         </li>
         <li>
-          <strong>Camera</strong> &mdash; declared for use by the embedded
-          WebView component (<code>@capgo/capacitor-inappbrowser</code>). It is
-          <strong>only activated</strong> when you interact with an HTML
-          file-upload input within the WebView (e.g., attaching a photo to a
-          prompt). The App itself never accesses the camera.
+          <strong>Camera</strong> &mdash; <strong>only activated</strong> when
+          you ask for it, in two places. When you tap
+          <strong>Scan QR code</strong> while adding a server, the App reads the
+          QR code printed by <code>opencode pair</code>. The code is read on your
+          device, camera images are not saved or sent anywhere, and only the
+          text of the code is used, to connect to your server. The embedded
+          WebView component (<code>@capgo/capacitor-inappbrowser</code>) also
+          uses the camera when you interact with an HTML file-upload input
+          within the WebView (e.g., attaching a photo to a prompt).
         </li>
       </ul>
 

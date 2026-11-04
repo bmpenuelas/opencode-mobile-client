@@ -48,9 +48,9 @@ opencode service set hostname 0.0.0.0
 opencode pair
 ```
 
-In the app, tap **Add server** and paste one of the printed links. Links work once and expire after 5 minutes. The app then keeps a session that it renews as you use it, so you only pair once. If you don't connect for 30 days, or the server password changes, pair again from **Edit server**.
+In the app, tap **Add server**, then tap **Scan QR code** to scan the code that `opencode pair` prints, or paste one of the printed links. Links work once and expire after 5 minutes. The app then keeps a session that it renews as you use it, so you only pair once. If you don't connect for 30 days, or the server password changes, pair again from **Edit server**.
 
-The QR code that `opencode pair` prints holds JSON rather than a link. The app can't scan it yet, but if your phone's camera reads it, you can paste that text in the same field.
+The QR code holds JSON rather than a link, so your phone's camera app won't open it. Scan it from the app instead. On Android, the app can't read the code on a light terminal theme, where it comes out light-on-dark. Switch to a dark theme or paste a link.
 
 A standalone `opencode serve` can't pair. Use **Use URL and password instead** with the password it prints. Find more options in the [official docs](https://opencode.ai/v2/docs/cli/web/).
 
