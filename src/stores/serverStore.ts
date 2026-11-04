@@ -108,6 +108,7 @@ export const useServerStore = defineStore('server', () => {
           username: profile.authEnabled ? profile.username : undefined,
           password: profile.authEnabled && password ? password : undefined,
           timeoutMs: 3500,
+          serverVersion: profile.serverVersion,
         })
       })
     )

@@ -3,6 +3,11 @@ import type { ServerProfile } from '@/types'
 
 const PROFILES_KEY = 'opencode_server_profiles'
 
+// Profiles saved before v2 support have neither field, and were all set up against v1 servers.
+function withDefaults(profile: ServerProfile): ServerProfile {
+  return { ...profile, serverVersion: profile.serverVersion ?? 'v1', paired: profile.paired ?? false }
+}
+
 function generateId(): string {
   return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
@@ -24,7 +29,7 @@ export const profileStorage: ProfileStorageAdapter = {
     const { value } = await Preferences.get({ key: PROFILES_KEY })
     if (!value) return []
     try {
-      return JSON.parse(value) as ServerProfile[]
+      return (JSON.parse(value) as ServerProfile[]).map(withDefaults)
     } catch {
       return []
     }

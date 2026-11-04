@@ -62,6 +62,7 @@
           >
             {{ t('servers.default') }}
           </Badge>
+          <Badge v-if="profile.serverVersion === 'v1'" variant="outline">v1</Badge>
           <Badge v-if="profile.authEnabled" variant="outline">{{ t('form.authentication') }}</Badge>
           <span class="ml-auto text-xs text-muted-foreground self-center">{{ statusLabel(profileStatus(profile)) }}</span>
         </CardContent>
@@ -110,6 +111,7 @@ function profileStatus(profile: ServerProfile): string {
   if (profile.id === connectionStore.lastWebviewServerId) return 'connected'
   if (profile.lastStatus === 'auth_required') return 'auth_required'
   if (profile.lastStatus === 'wrong_credentials') return 'wrong_credentials'
+  if (profile.lastStatus === 'incompatible') return 'incompatible'
   const r = serverStore.reachable[profile.id]
   if (r === true) return 'online'
   if (r === false) return 'offline'
@@ -120,7 +122,7 @@ function statusLabel(status: string): string {
     online: t('status.ready'), offline: t('status.offline'), connected: t('status.connected'),
     checking: t('status.checking'), auth_required: t('status.authRequired'),
     wrong_credentials: t('status.wrongCredentials'), unreachable: t('status.unreachable'),
-    frame_blocked: t('status.blocked'), unknown: t('status.unknown'),
+    frame_blocked: t('status.blocked'), incompatible: t('status.incompatible'), unknown: t('status.unknown'),
     reconnecting: t('status.reconnecting'), disconnected: t('status.disconnected'),
   }
   return map[status] ?? status

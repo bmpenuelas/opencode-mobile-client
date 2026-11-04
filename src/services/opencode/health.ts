@@ -1,14 +1,16 @@
 import { Capacitor } from '@capacitor/core'
-import type { HealthCheckResult, ServerStatus } from '@/types'
+import type { HealthCheckResult, ServerStatus, ServerVersion } from '@/types'
 import { normalizeUrl } from './url'
 import { buildBasicAuthHeader } from './auth'
 import { isDemoModeServer } from './demoMode'
+import { requestJson } from './http'
 
 interface HealthCheckOptions {
   baseUrl: string
   username?: string
   password?: string
   timeoutMs?: number
+  serverVersion?: ServerVersion
 }
 
 async function nativeRequest(url: string, headers: Record<string, string>, timeoutMs: number): Promise<{ status: number }> {
@@ -75,8 +77,22 @@ function classifyStatus(statusCode: number, hadAuth: boolean): ServerStatus {
   return 'unreachable'
 }
 
+// v2 serves the web shell at / before authenticating, so / answers 200 even with a wrong
+// password. /api/info is authenticated, and only a v2 server answers it with JSON.
+async function checkV2ServerHealth(baseUrl: string, headers: Record<string, string>, hasAuth: boolean, timeoutMs: number): Promise<HealthCheckResult> {
+  const { status, data } = await requestJson(`${baseUrl}/api/info`, { headers, timeoutMs })
+  const isV2Info = typeof (data as { version?: unknown } | undefined)?.version === 'string'
+
+  if ((status >= 200 && status < 300 && !isV2Info) || status === 404) {
+    return { reachable: true, status: 'incompatible', statusCode: status }
+  }
+
+  const statusName = classifyStatus(status, hasAuth)
+  return { reachable: statusName !== 'unreachable', status: statusName, statusCode: status }
+}
+
 export async function checkServerHealth(options: HealthCheckOptions): Promise<HealthCheckResult> {
-  const { baseUrl, username, password, timeoutMs = 3500 } = options
+  const { baseUrl, username, password, timeoutMs = 3500, serverVersion = 'v1' } = options
 
   if (isDemoModeServer({ baseUrl, username, password })) {
     return {
@@ -96,6 +112,10 @@ export async function checkServerHealth(options: HealthCheckOptions): Promise<He
   }
 
   try {
+    if (serverVersion === 'v2') {
+      return await checkV2ServerHealth(normalized, headers, hasAuth, timeoutMs)
+    }
+
     const { status } = await makeRequest(healthUrl, headers, timeoutMs)
     const statusName = classifyStatus(status, hasAuth)
 

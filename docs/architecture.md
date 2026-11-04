@@ -74,13 +74,45 @@ User → ServerProfileForm → serverStore.add/update → profileStorage (Prefer
    e. On 401 with stored pw → state → 'wrong_credentials'
    f. On network error → state → 'unreachable'
 4. On 'connected': router navigates to /connect/:id
-5. ConnectionShell builds iframe URL (with embedded Basic Auth if needed)
+5. ConnectionShell builds the web UI URL: with embedded Basic Auth if needed on v1,
+   or a fresh single-use sign-in link on v2 (see OpenCode v2 Pairing)
 6. Every 10s (configurable): health poll checks connectivity
 7. On health failure: state → 'disconnected', start exponential reconnect
 8. Reconnect: 1s, 2s, 4s, 8s, 15s, 30s (configurable)
 ```
 
+### OpenCode v2 Pairing
+
+Each profile has a `serverVersion`. New profiles default to `v2`. Profiles saved before v2 support have no such field and load as `v1`, since that is what they were set up against.
+
+v2 differs from v1 in three ways that shape this flow:
+
+- `/` serves the web shell before authenticating, so it can't be used as a health check and Basic Auth never reaches the web UI. A signed-out webview just shows the OpenCode sign-in screen.
+- `GET /auth/connect/:code` redeems a single-use code. A request accepting `text/html` gets a session cookie and a redirect to `/`. Any other request gets `{ token }`.
+- Session tokens work anywhere the password does, as the Basic Auth password for the fixed username `opencode`, and last 30 days.
+
+```
+Add server:
+  parsePairingLink(text)              printed link, or the {"code","urls"} JSON in the QR code
+  redeemPairingLink(link)             GET /auth/connect/:code with Accept: application/json
+  store the token as the password,    tries each address in turn and stops at the first answer,
+  with profile.paired = true          because the code is single-use
+
+Open the web UI:
+  mintPairingCode(profile, secret)    POST /api/pair, with the password or token
+  open /auth/connect/:code            the webview gets the cookie and lands on /
+
+Connect, with under 15 days left on a paired token:
+  renewSession(baseUrl, token)        mint a code and redeem it as JSON for a full 30 days
+```
+
+Minting a code for each launch means the webview needs nothing from an earlier launch, and the password or token never appears in a URL. It also works the same for password profiles, which `opencode serve` needs since only the background service can pair through the CLI.
+
+`paired` records that the stored secret is a token rather than a typed password, so it is never shown in the form and only tokens get renewed.
+
 ### Health Check
+
+On v2 servers, the check is an authenticated `GET /api/info` instead. A response that isn't JSON with a `version`, or a 404, gives the `incompatible` status, which tells the user to mark the server as v1.
 
 ```
 checkServerHealth(options):

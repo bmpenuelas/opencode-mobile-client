@@ -101,7 +101,7 @@ Testing steps:
 
 1- Open the app and select Add Server.
 2- Enter any server name.
-3- Enter the host and enable Authentication.
+3- Tap "Use URL and password instead", enter the host and enable Authentication.
 4- Enter the demo username and password above.
 5- Save the server profile and select Connect.
 

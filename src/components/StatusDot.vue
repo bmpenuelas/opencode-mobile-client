@@ -13,7 +13,7 @@ const statusLabel = computed(() => {
     checking: 'Checking...', reconnecting: 'Reconnecting...',
     idle: 'Ready to connect', auth_required: 'Authentication required',
     wrong_credentials: 'Wrong credentials', unreachable: 'Unreachable',
-    frame_blocked: 'Frame blocked', disconnected: 'Disconnected', unknown: 'Unknown',
+    frame_blocked: 'Frame blocked', incompatible: 'Wrong server version', disconnected: 'Disconnected', unknown: 'Unknown',
   }
   return map[props.status] ?? props.status
 })
@@ -23,7 +23,7 @@ const dotClass = computed(() => {
   if (s === 'connected' || s === 'online') return 'bg-green-500'
   if (s === 'checking' || s === 'reconnecting') return 'bg-muted-foreground animate-pulse'
   if (s === 'auth_required') return 'bg-muted-foreground'
-  if (['offline', 'wrong_credentials', 'unreachable', 'frame_blocked', 'disconnected'].includes(s)) return 'bg-destructive'
+  if (['offline', 'wrong_credentials', 'unreachable', 'frame_blocked', 'disconnected', 'incompatible'].includes(s)) return 'bg-destructive'
   return 'bg-muted'
 })
 </script>

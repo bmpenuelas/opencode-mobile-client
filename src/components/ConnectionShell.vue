@@ -32,6 +32,7 @@ import { useServerStore } from '@/stores/serverStore'
 import { useConnectionStore } from '@/stores/connectionStore'
 import { registerBackButton, unregisterBackButton } from '@/services/platform/backButton'
 import { buildIframeUrl } from '@/services/opencode/url'
+import { buildPairingConnectUrl, mintPairingCode } from '@/services/opencode/pairing'
 import { isDemoModeServer } from '@/services/opencode/demoMode'
 import {
   approveNativeNotificationsFromPrompt,
@@ -248,8 +249,9 @@ function buildToolbarScript(status: string, displayUrl: string): string {
   (function(){
     document.addEventListener('keydown',function(e){
       if(localStorage.getItem('oc_enter_newline')!=='1')return;
-      var inp=e.target.closest('[data-component="prompt-input"]');
-      if(!inp||e.key!=='Enter'||e.shiftKey)return;
+      var inp=e.target.closest('[data-component="prompt-input"],[data-component="composer-editor"]');
+      if(!inp||e.key!=='Enter'||e.shiftKey||e.isComposing)return;
+      if(document.querySelector('[data-component="composer-suggestions"]'))return;
       e.preventDefault();
       e.stopImmediatePropagation();
       document.execCommand('insertLineBreak',false,null);
@@ -558,13 +560,33 @@ async function isCurrentProfileDemoMode(): Promise<boolean> {
   })
 }
 
+// A signed-out v2 web UI shows its own sign-in screen and Basic auth never reaches it, so the
+// webview signs in by opening a fresh single-use code, which sets the session cookie and
+// redirects to the app. This also keeps the password and session token out of the URL.
+async function buildV2WebUrl(password: string | null): Promise<string | null> {
+  const { baseUrl, authEnabled, username } = profile.value!
+  if (!authEnabled || !password) return buildIframeUrl(baseUrl)
+  const code = await mintPairingCode({ baseUrl, username, password, timeoutMs: connectionStore.healthCheckTimeout })
+  return code ? buildPairingConnectUrl(baseUrl, code) : null
+}
+
+function showSignInFailed(): void {
+  loading.value = false
+  errorText.value = t('connection.signInFailed')
+}
+
 async function openInAppBrowser(): Promise<void> {
   const isIOS = Capacitor.getPlatform() === 'ios'
+  const isV2 = profile.value!.serverVersion === 'v2'
   const pw = await serverStore.getPassword(profile.value!.id)
-  const auth = profile.value!.authEnabled && pw
-  const url = isIOS && auth
-    ? buildIframeUrl(profile.value!.baseUrl, profile.value!.username, pw!)
-    : buildIframeUrl(profile.value!.baseUrl)
+  const auth = !isV2 && profile.value!.authEnabled && pw
+  const url = isV2
+    ? await buildV2WebUrl(pw)
+    : isIOS && auth
+      ? buildIframeUrl(profile.value!.baseUrl, profile.value!.username, pw!)
+      : buildIframeUrl(profile.value!.baseUrl)
+
+  if (!url) { showSignInFailed(); return }
 
   browserClosedHandle = await InAppBrowser.addListener('closeEvent', () => {
     connectionStore.disconnect()
@@ -666,11 +688,14 @@ async function openInAppBrowser(): Promise<void> {
 
 async function openInNewTabFallback(): Promise<void> {
   const pw = await serverStore.getPassword(profile.value!.id)
-  const url = buildIframeUrl(
-    profile.value!.baseUrl,
-    profile.value!.authEnabled ? profile.value!.username : undefined,
-    profile.value!.authEnabled && pw ? pw : undefined,
-  )
+  const url = profile.value!.serverVersion === 'v2'
+    ? await buildV2WebUrl(pw)
+    : buildIframeUrl(
+      profile.value!.baseUrl,
+      profile.value!.authEnabled ? profile.value!.username : undefined,
+      profile.value!.authEnabled && pw ? pw : undefined,
+    )
+  if (!url) { showSignInFailed(); return }
   window.open(url, '_blank')
   loading.value = false
   errorText.value = t('connection.opened')

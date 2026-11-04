@@ -51,7 +51,7 @@ const statusText = computed(() => {
   const map: Record<string, string> = {
     connected: t('status.connected'), checking: t('status.checking'), reconnecting: t('status.reconnecting'),
     disconnected: t('status.disconnected'), unreachable: t('status.unreachable'), auth_required: t('status.authRequired'),
-    wrong_credentials: t('status.wrongCredentials'), frame_blocked: t('status.blocked'), idle: t('status.idle'),
+    wrong_credentials: t('status.wrongCredentials'), frame_blocked: t('status.blocked'), incompatible: t('status.incompatible'), idle: t('status.idle'),
   }
   return map[connectionStore.state] ?? connectionStore.state
 })

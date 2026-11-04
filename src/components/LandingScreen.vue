@@ -122,7 +122,7 @@ const defaultProfile = computed(() => serverStore.defaultProfile)
 const statusForDot = computed(() => {
   if (!defaultProfile.value) return 'unknown'
   const ls = defaultProfile.value.lastStatus
-  if (ls === 'auth_required' || ls === 'wrong_credentials') return ls
+  if (ls === 'auth_required' || ls === 'wrong_credentials' || ls === 'incompatible') return ls
   const r = serverStore.reachable[defaultProfile.value.id]
   return r === true ? 'online' : r === false ? 'offline' : 'checking'
 })
@@ -134,6 +134,7 @@ const stateLabel = computed(() => {
   const ls = defaultProfile.value.lastStatus
   if (ls === 'auth_required') return t('status.authRequired')
   if (ls === 'wrong_credentials') return t('status.wrongCredentials')
+  if (ls === 'incompatible') return t('status.incompatible')
   const r = serverStore.reachable[defaultProfile.value.id]
   if (r === true) {
     if (defaultProfile.value.id === connectionStore.lastWebviewServerId) return t('status.connected')

@@ -3,6 +3,7 @@ import { setActivePinia, createPinia } from 'pinia'
 import { useConnectionStore } from '@/stores/connectionStore'
 import { useServerStore } from '@/stores/serverStore'
 import * as healthModule from '@/services/opencode/health'
+import * as pairingModule from '@/services/opencode/pairing'
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
@@ -56,6 +57,8 @@ describe('connectionStore', () => {
       allowInsecureHttp: true,
       lastStatus: 'unknown',
       lastConnectedAt: null,
+      serverVersion: 'v1',
+      paired: false,
     })
 
     const store = useConnectionStore()
@@ -82,6 +85,8 @@ describe('connectionStore', () => {
       allowInsecureHttp: true,
       lastStatus: 'unknown',
       lastConnectedAt: null,
+      serverVersion: 'v1',
+      paired: false,
     })
 
     const store = useConnectionStore()
@@ -109,6 +114,8 @@ describe('connectionStore', () => {
       allowInsecureHttp: true,
       lastStatus: 'unknown',
       lastConnectedAt: null,
+      serverVersion: 'v1',
+      paired: false,
     })
 
     await serverStore.setPassword(profile.id, 'wrong-password')
@@ -137,6 +144,8 @@ describe('connectionStore', () => {
       allowInsecureHttp: true,
       lastStatus: 'unknown',
       lastConnectedAt: null,
+      serverVersion: 'v1',
+      paired: false,
     })
 
     const store = useConnectionStore()
@@ -165,5 +174,113 @@ describe('connectionStore', () => {
     const store = useConnectionStore()
     store.cancelReconnect()
     expect(store.state).toBe('disconnected')
+  })
+
+  describe('with a v2 server', () => {
+    const DAY_S = 24 * 60 * 60
+
+    async function addPairedServer(paired = true) {
+      const serverStore = useServerStore()
+      const profile = await serverStore.add({
+        name: 'V2 Server',
+        baseUrl: 'http://192.168.1.100:49374',
+        authEnabled: true,
+        username: 'opencode',
+        isDefault: false,
+        allowInsecureHttp: true,
+        lastStatus: 'unknown',
+        lastConnectedAt: null,
+        serverVersion: 'v2',
+        paired,
+      })
+      return { serverStore, profile }
+    }
+
+    function tokenExpiringInDays(days: number): string {
+      return `${Math.floor(Date.now() / 1000) + days * DAY_S}.signature`
+    }
+
+    function mockHealth(status: 'connected' | 'wrong_credentials' | 'incompatible') {
+      return vi.spyOn(healthModule, 'checkServerHealth').mockResolvedValue({ reachable: true, status })
+    }
+
+    it('checks the server as v2', async () => {
+      const health = mockHealth('connected')
+      const { serverStore, profile } = await addPairedServer()
+      vi.spyOn(serverStore, 'getPassword').mockResolvedValue(tokenExpiringInDays(30))
+
+      const store = useConnectionStore()
+      await store.connect(profile.id)
+      store.disconnect()
+
+      expect(health).toHaveBeenCalledWith(expect.objectContaining({ serverVersion: 'v2' }))
+    })
+
+    it('renews a session close to expiring and stores the new token', async () => {
+      mockHealth('connected')
+      const renew = vi.spyOn(pairingModule, 'renewSession').mockResolvedValue('renewed.token')
+      const { serverStore, profile } = await addPairedServer()
+      vi.spyOn(serverStore, 'getPassword').mockResolvedValue(tokenExpiringInDays(5))
+      const setPassword = vi.spyOn(serverStore, 'setPassword').mockResolvedValue()
+
+      const store = useConnectionStore()
+      expect(await store.connect(profile.id)).toBe(true)
+      store.disconnect()
+
+      expect(renew).toHaveBeenCalled()
+      expect(setPassword).toHaveBeenCalledWith(profile.id, 'renewed.token')
+    })
+
+    it('still connects when renewal fails, keeping the old token', async () => {
+      mockHealth('connected')
+      vi.spyOn(pairingModule, 'renewSession').mockResolvedValue(null)
+      const { serverStore, profile } = await addPairedServer()
+      vi.spyOn(serverStore, 'getPassword').mockResolvedValue(tokenExpiringInDays(5))
+      const setPassword = vi.spyOn(serverStore, 'setPassword').mockResolvedValue()
+
+      const store = useConnectionStore()
+      expect(await store.connect(profile.id)).toBe(true)
+      store.disconnect()
+
+      expect(setPassword).not.toHaveBeenCalled()
+    })
+
+    it('leaves a typed password alone, even if it looks like a token', async () => {
+      mockHealth('connected')
+      const renew = vi.spyOn(pairingModule, 'renewSession').mockResolvedValue('renewed.token')
+      const { serverStore, profile } = await addPairedServer(false)
+      vi.spyOn(serverStore, 'getPassword').mockResolvedValue(tokenExpiringInDays(5))
+
+      const store = useConnectionStore()
+      await store.connect(profile.id)
+      store.disconnect()
+
+      expect(renew).not.toHaveBeenCalled()
+    })
+
+    it('tells the user to pair again when a session is no longer accepted', async () => {
+      mockHealth('wrong_credentials')
+      const { serverStore, profile } = await addPairedServer()
+      vi.spyOn(serverStore, 'getPassword').mockResolvedValue('expired.token')
+
+      const store = useConnectionStore()
+      expect(await store.connect(profile.id)).toBe(false)
+
+      expect(store.state).toBe('wrong_credentials')
+      expect(store.lastError).toContain('opencode pair')
+    })
+
+    it('points at the v1 option when the server is not v2', async () => {
+      mockHealth('incompatible')
+      const { serverStore, profile } = await addPairedServer()
+      vi.spyOn(serverStore, 'getPassword').mockResolvedValue(null)
+
+      const store = useConnectionStore()
+      expect(await store.connect(profile.id)).toBe(false)
+
+      expect(store.state).toBe('incompatible')
+      expect(store.isDisconnected).toBe(true)
+      expect(store.lastError).toContain('OpenCode v1 server')
+    })
   })
 })

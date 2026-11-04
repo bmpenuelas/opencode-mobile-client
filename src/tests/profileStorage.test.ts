@@ -21,6 +21,8 @@ function createProfile(overrides: Record<string, any> = {}) {
     allowInsecureHttp: true,
     lastStatus: 'unknown' as const,
     lastConnectedAt: null,
+    serverVersion: 'v2' as const,
+    paired: false,
     ...overrides,
   }
 }
@@ -44,6 +46,22 @@ describe('profileStorage', () => {
       expect(profiles).toHaveLength(2)
       expect(profiles[0].name).toBe('Test Server')
       expect(profiles[1].name).toBe('Server 2')
+    })
+
+    it('treats profiles saved before v2 support as v1', async () => {
+      const { serverVersion: _version, paired: _paired, ...legacy } = createProfile()
+      vi.mocked(Preferences.get).mockResolvedValue({ value: JSON.stringify([legacy]) })
+      const [profile] = await profileStorage.loadProfiles()
+      expect(profile.serverVersion).toBe('v1')
+      expect(profile.paired).toBe(false)
+    })
+
+    it('keeps the version of newer profiles', async () => {
+      const stored = createProfile({ paired: true })
+      vi.mocked(Preferences.get).mockResolvedValue({ value: JSON.stringify([stored]) })
+      const [profile] = await profileStorage.loadProfiles()
+      expect(profile.serverVersion).toBe('v2')
+      expect(profile.paired).toBe(true)
     })
 
     it('returns empty array on parse error', async () => {

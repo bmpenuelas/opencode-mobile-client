@@ -16,7 +16,9 @@ Chat with your agents from your phone while they and the server run on your comp
 - ⌨️ Toggleable Enter=newline mode (Enter inserts a newline, Shift+Enter sends the prompt)
 - 📱 Injects narrow-screen fixes to the stock OpenCode web UI
 - 📋 Multiple server profiles with auto-connect support
-- 🔑 Basic Auth support (matching OpenCode's `OPENCODE_SERVER_PASSWORD`)
+- 🔗 Pair with OpenCode v2 servers using a link from `opencode pair`
+- 🕰️ OpenCode v1 servers still supported: mark the server as v1 when adding it
+- 🔑 Password support (matching OpenCode's `OPENCODE_SERVER_PASSWORD`)
 - 🎛️ Pull-down menu for server management while connected. Pull to refresh, tap ⋮ to open menu.
 - ❤️ Automatic health checks with exponential reconnect
 - 🔒 Secure storage for passwords (Keychain/EncryptedSharedPreferences)
@@ -34,13 +36,35 @@ Chat with your agents from your phone while they and the server run on your comp
 
 The app is a client that connects to a opencode web server running on the machine where you have your code and build tools. It needs a running web server to connect to.
 
-### No authentication
+### OpenCode v2 (default)
+
+Let other devices connect to the background service, then create a pairing link:
+
+```bash
+opencode service set hostname 0.0.0.0
+```
+
+```bash
+opencode pair
+```
+
+In the app, tap **Add server** and paste one of the printed links. Links work once and expire after 5 minutes. The app then keeps a session that it renews as you use it, so you only pair once. If you don't connect for 30 days, or the server password changes, pair again from **Edit server**.
+
+The QR code that `opencode pair` prints holds JSON rather than a link. The app can't scan it yet, but if your phone's camera reads it, you can paste that text in the same field.
+
+A standalone `opencode serve` can't pair. Use **Use URL and password instead** with the password it prints. Find more options in the [official docs](https://opencode.ai/v2/docs/cli/web/).
+
+### OpenCode v1
+
+Turn on **OpenCode v1 server** when adding the server. Servers saved before the app supported v2 stay marked as v1, so if you upgrade a server, edit it, turn that off, and pair it.
+
+#### No authentication
 
 ```bash
 opencode web --hostname 0.0.0.0 --port 4096
 ```
 
-### With authentication (recommended)
+#### With authentication (recommended)
 
 ```bash
 export OPENCODE_SERVER_PASSWORD="your-secret-password"
@@ -59,6 +83,15 @@ When auth is enabled, the username defaults to `opencode` in the app. Find more 
 - Verify the URL is correct. Try `curl http://your-server:4096/` from another device on the same network.
 - Check that the port is not firewalled.
 - Ensure the server is listening on `0.0.0.0` (not `127.0.0.1`, which would only accept local connections).
+
+### Pairing link doesn't work (v2)
+
+- Links work once and expire after 5 minutes. Run `opencode pair` again for a new one.
+- If the link starts with `http://127.0.0.1`, the server only accepts local connections. Run `opencode service set hostname 0.0.0.0`, then `opencode pair` again.
+
+### Wrong server version
+
+- The server didn't answer like OpenCode v2. If it runs v1, go to Edit Server and turn on **OpenCode v1 server**.
 
 ### Auth required
 

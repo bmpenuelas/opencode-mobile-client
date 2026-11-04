@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { ConnectionState, ServerProfile } from '@/types'
 import { checkServerHealth } from '@/services/opencode/health'
+import { renewSession, shouldRenewSession } from '@/services/opencode/pairing'
+import { t } from '@/i18n'
 import { useServerStore } from './serverStore'
 
 const DEFAULT_TIMEOUT = 3500
@@ -34,7 +36,7 @@ export const useConnectionStore = defineStore('connection', () => {
   const isChecking = computed(() => state.value === 'checking')
   const isReconnecting = computed(() => state.value === 'reconnecting')
   const isDisconnected = computed(() =>
-    ['unreachable', 'wrong_credentials', 'frame_blocked', 'disconnected'].includes(state.value)
+    ['unreachable', 'wrong_credentials', 'frame_blocked', 'disconnected', 'incompatible'].includes(state.value)
   )
 
   function setHealthCheckTimeout(ms: number): void {
@@ -72,6 +74,7 @@ export const useConnectionStore = defineStore('connection', () => {
       username: profile.authEnabled ? profile.username : undefined,
       password: profile.authEnabled && password ? password : undefined,
       timeoutMs: healthCheckTimeout.value,
+      serverVersion: profile.serverVersion,
     })
 
     state.value = result.status
@@ -81,8 +84,17 @@ export const useConnectionStore = defineStore('connection', () => {
         lastStatus: 'connected',
         lastConnectedAt: new Date().toISOString(),
       })
+      if (profile.paired && password && shouldRenewSession(password)) {
+        const renewed = await renewSession(profile.baseUrl, password, healthCheckTimeout.value)
+        if (renewed) await serverStore.setPassword(serverId, renewed)
+      }
       startHealthPoll(serverId)
       return true
+    }
+
+    if (result.status === 'incompatible') {
+      lastError.value = t('connection.incompatible')
+      return false
     }
 
     if (result.status === 'auth_required') {
@@ -92,7 +104,7 @@ export const useConnectionStore = defineStore('connection', () => {
 
     if (result.status === 'wrong_credentials') {
       state.value = 'wrong_credentials'
-      lastError.value = 'The username or password is incorrect.'
+      lastError.value = profile.paired ? t('connection.pairingExpired') : 'The username or password is incorrect.'
       return false
     }
 
@@ -118,6 +130,7 @@ export const useConnectionStore = defineStore('connection', () => {
         username: profile.authEnabled ? profile.username : undefined,
         password: profile.authEnabled && password ? password : undefined,
         timeoutMs: healthCheckTimeout.value,
+        serverVersion: profile.serverVersion,
       })
 
       if (result.status === 'connected') {
@@ -168,6 +181,7 @@ export const useConnectionStore = defineStore('connection', () => {
         username: profile.authEnabled ? profile.username : undefined,
         password: profile.authEnabled && password ? password : undefined,
         timeoutMs: healthCheckTimeout.value,
+        serverVersion: profile.serverVersion,
       })
 
       if (result.status === 'connected') {
