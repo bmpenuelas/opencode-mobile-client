@@ -26,7 +26,7 @@ PCとスマートフォンをシームレスに行き来できます。デスク
 
 ◆ HTTPまたはHTTPSで任意のOpenCodeサーバーに接続。ローカルネットワーク、VPN、Tailscale経由のリモート接続に対応。
 ◆ 複数のサーバープロファイルを作成し、よく使うサーバーへ自動接続。
-◆ OPENCODE_SERVER_PASSWORDで設定したOpenCodeサーバーを含むBasic Authに対応。
+◆ QRコードのスキャンまたはリンクの貼り付けでOpenCode v2とペアリング。パスワード保護されたサーバーやOpenCode v1にも対応。
 ◆ アプリ内でサーバーを管理。下に引っ張って管理・更新するか、メニューを開いて操作できます。
 ◆ サーバーの状態を自動確認し、待機時間を徐々に延ばしながら再接続。
 ◆ パスワードはKeychainに安全に保存。
@@ -46,6 +46,22 @@ https://github.com/bmpenuelas/opencode-mobile-client
 本アプリを使うには、OpenCodeサーバーを起動しておく必要があります。
 
 OpenCode Mobileは、コードと開発ツールがあるコンピュータ上で動作するOpenCode Webサーバーに接続するクライアントです。
+
+► OpenCode v2
+
+コンピュータで次の2つのコマンドを実行します：
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+次にアプリでサーバーを追加し、QRコードをスキャンするかリンクを貼り付けます。リンクは1回のみ有効で、5分で期限切れになります。
+
+opencode serveを直接実行している場合は、「Use URL and password instead」を選び、表示されたパスワードを入力してください。
+
+► OpenCode v1
+
+サーバーの追加時に「OpenCode v1 server」をオンにし、次のように起動します：
 
 ► 認証なし
 

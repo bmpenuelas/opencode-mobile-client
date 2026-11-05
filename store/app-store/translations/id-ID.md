@@ -26,7 +26,7 @@ FITUR:
 
 ◆ Terhubung ke server OpenCode mana pun melalui HTTP atau HTTPS, di jaringan lokal maupun dari jauh lewat VPN atau Tailscale.
 ◆ Buat beberapa profil server dan terhubung otomatis ke server pilihan Anda.
-◆ Dukungan Basic Auth, termasuk server OpenCode yang dikonfigurasi dengan OPENCODE_SERVER_PASSWORD.
+◆ Pasangkan dengan OpenCode v2 dengan memindai kode QR atau menempelkan tautan. Juga berfungsi dengan server yang dilindungi kata sandi dan OpenCode v1.
 ◆ Kelola server dari dalam aplikasi: tarik ke bawah, segarkan, atau buka menu.
 ◆ Pemeriksaan kondisi server otomatis dan penyambungan kembali dengan jeda yang makin panjang.
 ◆ Kata sandi disimpan dengan aman di Keychain.
@@ -46,6 +46,22 @@ MULAI CEPAT:
 Server OpenCode harus berjalan untuk menggunakan aplikasi ini.
 
 OpenCode Mobile adalah klien yang terhubung ke server web OpenCode yang berjalan di komputer tempat kode dan alat pengembangan Anda berada.
+
+► OpenCode v2
+
+Jalankan dua perintah ini di komputer Anda:
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+Lalu di aplikasi, tambahkan server dan pindai kode QR atau tempelkan tautan. Tautan hanya bisa dipakai sekali dan kedaluwarsa setelah 5 menit.
+
+Menjalankan opencode serve secara langsung? Pilih "Use URL and password instead" dan masukkan kata sandi yang ditampilkan.
+
+► OpenCode v1
+
+Saat menambahkan server, aktifkan "OpenCode v1 server" dan jalankan seperti ini:
 
 ► Tanpa autentikasi
 

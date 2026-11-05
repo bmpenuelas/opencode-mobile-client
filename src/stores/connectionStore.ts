@@ -99,6 +99,7 @@ export const useConnectionStore = defineStore('connection', () => {
 
     if (result.status === 'auth_required') {
       state.value = 'auth_required'
+      lastError.value = t('tips.authRequired')
       return false
     }
 

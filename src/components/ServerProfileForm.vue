@@ -9,6 +9,15 @@
 
     <form novalidate class="flex-1 p-4 flex flex-col overflow-y-auto pb-6" @submit.prevent="handleSubmit">
       <div class="flex-1 flex flex-col justify-center gap-4">
+      <SetupTip v-if="showSetupTip" :title="t('tips.onComputer')" :steps="setupSteps">
+        <Badge variant="outline" class="h-auto whitespace-normal"><Wifi />{{ t('tips.chipNetwork') }}</Badge>
+        <Badge v-if="usesPairing" variant="outline" class="h-auto whitespace-normal"><Clock />{{ t('tips.chipLink') }}</Badge>
+        <Badge v-else-if="!form.legacyV1" variant="outline" class="h-auto whitespace-normal"><User />{{ t('tips.chipUsername') }}</Badge>
+      </SetupTip>
+      <p v-if="isEdit && form.legacyV1" class="flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
+        <Info class="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+        <span>{{ t('tips.v1Upgrade') }}</span>
+      </p>
       <Card>
         <CardContent class="flex flex-col gap-4">
           <div class="flex flex-col gap-1.5">
@@ -18,11 +27,16 @@
           <div v-if="usesPairing" class="flex flex-col gap-1.5">
             <Label for="pairingLink" class="text-center justify-center">{{ t('form.pairingLink') }}</Label>
             <Input id="pairingLink" v-model="form.pairingLink" placeholder="http://192.168.1.100:49374/auth/connect/…" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" />
+            <p v-if="linkFeedback" class="flex gap-1.5 text-xs leading-relaxed" :class="linkFeedback.ok ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'" role="status">
+              <component :is="linkFeedback.ok ? CircleCheck : TriangleAlert" class="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+              <span class="min-w-0 break-words">{{ linkFeedback.text }}</span>
+            </p>
             <Button v-if="canScan" type="button" variant="outline" :disabled="scanning" @click="scanPairingCode">
               <QrCode class="h-4 w-4" />
               {{ t('form.scanQr') }}
             </Button>
-            <p class="text-xs text-muted-foreground">{{ pairingHint }}</p>
+            <p v-if="showDarkTerminalTip" class="text-xs text-muted-foreground">{{ t('tips.scanDark') }}</p>
+            <p v-if="editedProfile?.paired" class="text-xs text-muted-foreground">{{ t('form.pairingKeep', { url: sanitizeUrlForDisplay(editedProfile.baseUrl) }) }}</p>
           </div>
           <div v-else class="flex flex-col gap-1.5">
             <Label for="baseUrl" class="text-center justify-center">{{ t('form.url') }}</Label>
@@ -77,8 +91,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft, QrCode } from '@lucide/vue'
+import { Capacitor } from '@capacitor/core'
+import { ArrowLeft, CircleCheck, Clock, Info, QrCode, TriangleAlert, User, Wifi } from '@lucide/vue'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -91,6 +107,7 @@ import { isDemoModeCredentials } from '@/services/opencode/demoMode'
 import { canScanQrCode, scanQrCode } from '@/services/platform/qrScanner'
 import type { ServerProfile } from '@/types'
 import { useI18n } from '@/i18n'
+import SetupTip from './SetupTip.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -116,9 +133,41 @@ const form = ref({
 
 const canScan = canScanQrCode()
 const usesPairing = computed(() => !form.value.legacyV1 && !form.value.manual)
-const pairingHint = computed(() => editedProfile.value?.paired
-  ? t('form.pairingKeep', { url: sanitizeUrlForDisplay(editedProfile.value.baseUrl) })
-  : t(canScan ? 'form.pairingHintScan' : 'form.pairingHint'))
+// Android's scanner can't read the light-on-dark code a light terminal theme produces.
+const showDarkTerminalTip = canScan && Capacitor.getPlatform() === 'android'
+
+// Editing a working server needs no setup steps, unless it is moving to pairing.
+const showSetupTip = computed(() => !isEdit.value || (usesPairing.value && !editedProfile.value?.paired))
+
+const setupSteps = computed(() => {
+  if (form.value.legacyV1) {
+    return [
+      { text: t('tips.v1Start'), command: 'opencode web --hostname 0.0.0.0 --port 4096' },
+      { text: t('tips.v1Password') },
+    ]
+  }
+  if (form.value.manual) {
+    return [
+      { text: t('tips.manualStart'), command: 'opencode serve --hostname 0.0.0.0 --port 4096' },
+      { text: t('tips.manualEnter') },
+    ]
+  }
+  return [
+    { text: t('tips.pair1'), command: 'opencode service set hostname 0.0.0.0' },
+    { text: t('tips.pair2'), command: 'opencode pair' },
+    { text: t(canScan ? 'tips.pair3Scan' : 'tips.pair3') },
+  ]
+})
+
+// Catches a link that can't work before it spends the single-use code.
+const linkFeedback = computed(() => {
+  const value = form.value.pairingLink.trim()
+  if (!value) return null
+  const link = parsePairingLink(value)
+  if (!link) return { ok: false, text: t('tips.linkInvalid') }
+  if (isLoopbackLink(link)) return { ok: false, text: t('form.pairingLoopback') }
+  return { ok: true, text: t('tips.linkOk', { host: new URL(link.urls[0]).host }) }
+})
 
 const showPassword = ref(false)
 const saving = ref(false)

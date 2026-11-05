@@ -20,7 +20,7 @@ Chat with your agents from your phone while they and the server run on your comp
 
 🌐 Connect to any OpenCode server over HTTP/HTTPS (LAN or VPN / Tailscale when you're away from home🚶)
 📋 Multiple server profiles with auto-connect support
-🔑 Basic Auth support (matching OpenCode's OPENCODE_SERVER_PASSWORD)
+🔗 Pair with OpenCode v2 by scanning a QR code or pasting a link. Also works with password-protected servers and OpenCode v1.
 🎛️ Pull-down menu for server management while connected. Pull to refresh, tap ⋮ to open menu.
 ❤️ Automatic health checks with exponential reconnect
 🔒 Secure storage for passwords (Keychain / EncryptedSharedPreferences)
@@ -35,7 +35,17 @@ https://github.com/bmpenuelas/opencode-mobile-client
 
 Quick start: Start your OpenCode Server (REQUIRED TO USE THE APP❗)
 
-The app is a client that connects to a OpenCode web server running on the machine where you have your code and build tools. It needs a running web server to connect to.
+The app is a client. It connects to OpenCode running on the machine where you have your code and build tools.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Then, in the app, add a server and scan the QR code or paste a link. Links work once and expire after 5 minutes.
+
+Running opencode serve directly? Choose "Use URL and password instead" and enter the password it prints.
+
+OpenCode v1: When adding the server, turn on "OpenCode v1 server" and start it like this:
 
 No authentication:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -53,7 +63,7 @@ When auth is enabled, the username defaults to opencode in the app.
 - App activity / analytics: none.
 - Crash logs: no third-party crash reporting SDK by default.
 - User-provided server URLs/usernames are stored locally on device.
-- Passwords are stored locally using Android secure storage.
+- Passwords and pairing session tokens are stored locally using Android secure storage.
 - Network traffic goes only to OpenCode servers configured by the user.
 - Photos and videos: not collected. The camera reads the pairing QR code on the device, and images are not saved or sent anywhere.
 

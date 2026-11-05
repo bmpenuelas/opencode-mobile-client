@@ -36,8 +36,9 @@
             </div>
             <Button variant="ghost" size="sm" @click.stop="connectDefault" :title="t('landing.connect')"><Play class="fill-current size-3" /></Button>
           </CardContent>
-          <CardFooter class="text-xs text-muted-foreground pt-[4.7px] pb-3">
+          <CardFooter class="flex-col items-start gap-2 text-xs text-muted-foreground pt-[4.7px] pb-3">
             {{ stateLabel }}
+            <ServerTip :profile="defaultProfile" :status="statusForDot" editable />
           </CardFooter>
         </Card>
 
@@ -48,8 +49,9 @@
           tabindex="0"
           @keydown.enter="addServer"
         >
-          <CardContent class=" text-center">
+          <CardContent class="flex flex-col gap-1 text-center">
             <p class="text-sm text-muted-foreground">{{ t('landing.noServer') }}</p>
+            <p class="text-xs leading-relaxed text-muted-foreground">{{ t('tips.landing') }}</p>
           </CardContent>
         </Card>
 
@@ -95,6 +97,7 @@ import { sanitizeUrlForDisplay } from '@/services/opencode/url'
 import { configureSystemBars } from '@/services/platform/systemBars'
 import { useServerHealthPoll } from '@/composables/useServerHealthPoll'
 import { usePullToRefresh } from '@/composables/usePullToRefresh'
+import ServerTip from './ServerTip.vue'
 import StatusDot from './StatusDot.vue'
 import { useI18n } from '@/i18n'
 

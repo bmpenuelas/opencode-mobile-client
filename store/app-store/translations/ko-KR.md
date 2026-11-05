@@ -26,7 +26,7 @@ OpenCode Mobile로 iPhone에서도 OpenCode 에이전트를 사용할 수 있습
 
 ◆ HTTP 또는 HTTPS로 모든 OpenCode 서버에 연결. 로컬 네트워크는 물론 VPN 또는 Tailscale을 통한 원격 연결도 지원합니다.
 ◆ 여러 서버 프로필을 만들고 자주 쓰는 서버에 자동으로 연결합니다.
-◆ OPENCODE_SERVER_PASSWORD로 구성한 OpenCode 서버를 포함해 Basic Auth를 지원합니다.
+◆ QR 코드를 스캔하거나 링크를 붙여넣어 OpenCode v2와 페어링합니다. 비밀번호로 보호된 서버와 OpenCode v1도 지원합니다.
 ◆ 앱 안에서 서버를 관리하세요. 아래로 당겨 관리하거나 새로 고치고, 메뉴를 열어 추가 작업을 할 수 있습니다.
 ◆ 서버 상태를 자동으로 확인하고, 대기 시간을 늘려 가며 재연결합니다.
 ◆ 비밀번호는 Keychain에 안전하게 저장됩니다.
@@ -46,6 +46,22 @@ https://github.com/bmpenuelas/opencode-mobile-client
 앱을 사용하려면 OpenCode 서버가 실행 중이어야 합니다.
 
 OpenCode Mobile은 코드와 개발 도구가 있는 컴퓨터에서 실행되는 OpenCode 웹 서버에 연결하는 클라이언트입니다.
+
+► OpenCode v2
+
+컴퓨터에서 다음 두 명령을 실행하세요:
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+그런 다음 앱에서 서버를 추가하고 QR 코드를 스캔하거나 링크를 붙여넣으세요. 링크는 한 번만 사용할 수 있으며 5분 후 만료됩니다.
+
+opencode serve를 직접 실행하나요? "Use URL and password instead"를 선택하고 표시된 비밀번호를 입력하세요.
+
+► OpenCode v1
+
+서버를 추가할 때 "OpenCode v1 server"를 켜고 다음과 같이 시작하세요:
 
 ► 인증 없이 사용
 

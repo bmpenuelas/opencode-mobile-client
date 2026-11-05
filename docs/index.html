@@ -347,7 +347,15 @@
           <li>📱 Injects narrow-screen fixes to the stock OpenCode web UI</li>
           <li>📋 Multiple server profiles with auto-connect support</li>
           <li>
-            🔑 Basic Auth support (matching OpenCode's
+            🔗 Pair with OpenCode v2 by scanning the QR code from
+            <code>opencode pair</code> or pasting a link
+          </li>
+          <li>
+            💡 Setup tips in the app that show what to run on your computer
+          </li>
+          <li>🕰️ OpenCode v1 servers still supported</li>
+          <li>
+            🔑 Password support (matching OpenCode's
             <code>OPENCODE_SERVER_PASSWORD</code>)
           </li>
           <li>
@@ -410,13 +418,89 @@
 
       <section>
         <h2>
-          How to start your OpenCode Server
+          How to set up your OpenCode server
           <span class="alert">(REQUIRED TO USE THE APP❗)</span>
         </h2>
         <p>
-          The app is a client that connects to a OpenCode web server running on
-          the machine where you have your code and build tools. It needs a
-          running web server to connect to.
+          The app is a client. It connects to OpenCode running on the machine
+          where you have your code and build tools, so that needs to be set up
+          first. The app shows these steps too when you add a server.
+        </p>
+
+        <h3
+          style="
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            margin-top: 1.5rem;
+          "
+        >
+          OpenCode v2
+          <span style="color: var(--text-dim); font-weight: 400">(default)</span>
+        </h3>
+        <div class="code-block">
+          <code class="comment"># let your phone reach it (only needed once)</code>
+          <br />
+          <code>opencode service set hostname 0.0.0.0</code>
+          <br />
+          <code class="comment"># print a QR code and pairing links</code>
+          <br />
+          <code>opencode pair</code>
+        </div>
+        <p>
+          In the app, add a server, then scan the QR code or paste a link. Your
+          phone needs to be on the same Wi-Fi or VPN as your computer. Links
+          work once and expire after 5 minutes.
+        </p>
+
+        <h3
+          style="
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            margin-top: 1.5rem;
+          "
+        >
+          Using <code>opencode serve</code> instead
+        </h3>
+        <div class="code-block">
+          <code>opencode serve --hostname 0.0.0.0 --port 4096</code>
+        </div>
+        <p>
+          A standalone server can't pair. In the app, choose
+          <strong>Use URL and password instead</strong> and enter the password
+          it prints.
+        </p>
+
+        <h3
+          style="
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            margin-top: 1.5rem;
+          "
+        >
+          Away from home
+        </h3>
+        <p>
+          Use a VPN such as Tailscale on both devices. You can also run
+          <code>opencode pair --remote</code>, which reaches your computer
+          through a tunnel. That exposes the server to the internet, protected
+          by its password.
+        </p>
+
+        <h3
+          style="
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            margin-top: 1.5rem;
+          "
+        >
+          OpenCode v1
+        </h3>
+        <p>
+          Turn on <strong>OpenCode v1 server</strong> when adding the server.
         </p>
 
         <h3

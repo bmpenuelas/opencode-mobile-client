@@ -31,6 +31,13 @@
         <pre class="text-xs bg-muted p-3 rounded-md overflow-x-auto mb-6">opencode service set hostname 0.0.0.0
 opencode pair</pre>
 
+        <h3 class="text-sm font-semibold mb-2">{{ t('help.serveTitle') }}</h3>
+        <p class="text-sm leading-relaxed mb-2">{{ t('help.serveText') }}</p>
+        <pre class="text-xs bg-muted p-3 rounded-md overflow-x-auto mb-6">opencode serve --hostname 0.0.0.0 --port 4096</pre>
+
+        <h3 class="text-sm font-semibold mb-2">{{ t('help.awayTitle') }}</h3>
+        <p class="text-sm leading-relaxed mb-6" v-html="t('help.awayText')" />
+
         <h3 class="text-sm font-semibold mb-2">{{ t('help.v1Title') }}</h3>
         <p class="text-sm leading-relaxed mb-4">{{ t('help.v1Text') }}</p>
 
@@ -57,6 +64,11 @@ opencode serve --hostname 0.0.0.0 --port 4096</pre>
           <div>
             <h3 class="text-sm font-semibold mb-1">{{ t('help.pairing') }}</h3>
             <p class="text-sm leading-relaxed" v-html="t('help.pairingText')" />
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold mb-1">{{ t('help.address') }}</h3>
+            <p class="text-sm leading-relaxed" v-html="t('help.addressText')" />
           </div>
 
           <div>

@@ -26,7 +26,7 @@ OpenCode Mobile 将你的 OpenCode 智能体带到 iPhone。将应用连接到�
 
 ◆ 通过 HTTP 或 HTTPS 连接任意 OpenCode 服务器；支持局域网、VPN 或 Tailscale 远程访问。
 ◆ 创建多个服务器配置，并自动连接到常用服务器。
-◆ 支持 Basic Auth，包括使用 OPENCODE_SERVER_PASSWORD 配置的 OpenCode 服务器。
+◆ 扫描二维码或粘贴链接即可与 OpenCode v2 配对，也支持受密码保护的服务器和 OpenCode v1。
 ◆ 在应用内管理服务器：下拉即可管理或刷新，也可以打开菜单操作。
 ◆ 自动检查服务器状态，并以逐步延长的间隔重新连接。
 ◆ 密码安全保存在 Keychain 中。
@@ -46,6 +46,22 @@ https://github.com/bmpenuelas/opencode-mobile-client
 使用本应用前，需要先运行 OpenCode 服务器。
 
 OpenCode Mobile 是一个客户端，用于连接运行在电脑上的 OpenCode Web 服务器；该电脑应具备你的代码和开发工具。
+
+► OpenCode v2
+
+在电脑上运行以下两条命令：
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+然后在应用中添加服务器，并扫描二维码或粘贴链接。链接仅可使用一次，5 分钟后失效。
+
+直接运行 opencode serve？请选择“改用 URL 和密码”，并输入它显示的密码。
+
+► OpenCode v1
+
+添加服务器时，请开启“OpenCode v1 服务器”，然后这样启动：
 
 ► 无需认证
 

@@ -120,6 +120,10 @@ On native platforms the pairing field offers **Scan QR code**. `scanQrCode()` in
 
 After upgrading the plugin, scan a code with a release build. A new version could reach ML Kit from the ZXing path, which would only fail at runtime.
 
+### Setup Tips
+
+The form shows the commands to run on the computer for the chosen mode (`SetupTip.vue`), and checks a pasted link as it is typed so a loopback link is caught before it spends the code. Once a server exists, `serverTip()` in `services/opencode/setupTips.ts` maps its status to what to check, and `ServerTip.vue` shows that on the landing and server screens. The connect error screen uses the same mapping.
+
 ### Health Check
 
 On v2 servers, the check is an authenticated `GET /api/info` instead. A response that isn't JSON with a `version`, or a 404, gives the `incompatible` status, which tells the user to mark the server as v1.

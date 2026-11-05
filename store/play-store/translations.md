@@ -22,7 +22,7 @@ FUNKTIONEN:
 
 ◆ Verbindung mit jedem OpenCode-Server über HTTP oder HTTPS – im lokalen Netzwerk oder unterwegs über VPN bzw. Tailscale.
 ◆ Mehrere Serverprofile mit automatischer Verbindung zum bevorzugten Server.
-◆ Unterstützung für Basic Auth, auch für OpenCode-Server mit OPENCODE_SERVER_PASSWORD.
+◆ Mit OpenCode v2 koppeln: QR-Code scannen oder Link einfügen. Funktioniert auch mit passwortgeschützten Servern und OpenCode v1.
 ◆ Serververwaltung direkt in der App: herunterziehen, aktualisieren oder das Menü öffnen.
 ◆ Automatische Erreichbarkeitsprüfungen und Wiederverbindung mit zunehmenden Wartezeiten.
 ◆ Sichere Passwortspeicherung auf dem Gerät.
@@ -40,6 +40,16 @@ SCHNELLSTART:
 Für die Nutzung der App muss ein OpenCode-Server laufen.
 
 OpenCode Mobile ist ein Client für den OpenCode-Webserver auf dem Computer, auf dem sich dein Code und deine Entwicklungswerkzeuge befinden.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Dann in der App einen Server hinzufügen und den QR-Code scannen oder einen Link einfügen. Links funktionieren einmal und laufen nach 5 Minuten ab.
+
+Du startest opencode serve selbst? Wähle „Stattdessen URL und Passwort verwenden“ und gib das angezeigte Passwort ein.
+
+OpenCode v1: Beim Hinzufügen des Servers „OpenCode-v1-Server“ aktivieren und ihn so starten:
 
 Ohne Authentifizierung:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -72,7 +82,7 @@ CARACTERÍSTICAS:
 
 ◆ Conexión a cualquier servidor OpenCode por HTTP o HTTPS, tanto en la red local como a distancia mediante VPN o Tailscale.
 ◆ Varios perfiles de servidor y conexión automática al que prefieras.
-◆ Compatibilidad con autenticación básica, incluidos los servidores OpenCode configurados con OPENCODE_SERVER_PASSWORD.
+◆ Empareja con OpenCode v2 escaneando un código QR o pegando un enlace. También funciona con servidores protegidos por contraseña y con OpenCode v1.
 ◆ Gestiona los servidores desde la app: desliza hacia abajo, actualiza o abre el menú.
 ◆ Comprobaciones automáticas del estado del servidor y reconexión con esperas progresivas.
 ◆ Contraseñas guardadas de forma segura en el dispositivo.
@@ -90,6 +100,16 @@ PRIMEROS PASOS:
 Necesitas tener un servidor OpenCode en ejecución para usar la app.
 
 OpenCode Mobile es un cliente que se conecta al servidor web de OpenCode que se ejecuta en el ordenador donde tienes el código y las herramientas de desarrollo.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Después, en la app, añade un servidor y escanea el código QR o pega un enlace. Los enlaces funcionan una vez y caducan a los 5 minutos.
+
+¿Ejecutas opencode serve directamente? Elige “Usar URL y contraseña” e introduce la contraseña que muestra.
+
+OpenCode v1: Al añadir el servidor, activa “Servidor OpenCode v1” e inícialo así:
 
 Sin autenticación:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -122,7 +142,7 @@ FONCTIONNALITÉS :
 
 ◆ Connexion à tout serveur OpenCode en HTTP ou HTTPS, sur le réseau local ou à distance via un VPN ou Tailscale.
 ◆ Plusieurs profils de serveur et connexion automatique à votre serveur favori.
-◆ Prise en charge de l’authentification Basic, y compris pour les serveurs OpenCode configurés avec OPENCODE_SERVER_PASSWORD.
+◆ Appairage avec OpenCode v2 en scannant un code QR ou en collant un lien. Compatible aussi avec les serveurs protégés par mot de passe et OpenCode v1.
 ◆ Gestion des serveurs depuis l’app : tirez vers le bas, actualisez ou ouvrez le menu.
 ◆ Vérifications automatiques de l’état du serveur et reconnexion avec délais progressifs.
 ◆ Mots de passe stockés de façon sécurisée sur l’appareil.
@@ -140,6 +160,16 @@ PRISE EN MAIN :
 Un serveur OpenCode doit être en cours d’exécution pour utiliser l’app.
 
 OpenCode Mobile est un client qui se connecte au serveur web OpenCode lancé sur l’ordinateur où se trouvent votre code et vos outils de développement.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Ensuite, dans l’app, ajoutez un serveur, puis scannez le code QR ou collez un lien. Les liens fonctionnent une fois et expirent après 5 minutes.
+
+Vous lancez opencode serve directement ? Choisissez « Utiliser l’URL et le mot de passe » et entrez le mot de passe affiché.
+
+OpenCode v1: En ajoutant le serveur, activez « Serveur OpenCode v1 », puis démarrez-le ainsi :
 
 Sans authentification :
 opencode web --hostname 0.0.0.0 --port 4096
@@ -172,7 +202,7 @@ OpenCode Mobile
 
 ◆ HTTP या HTTPS के ज़रिए किसी भी OpenCode सर्वर से कनेक्ट करें—लोकल नेटवर्क पर या दूर से VPN / Tailscale के माध्यम से।
 ◆ कई सर्वर प्रोफ़ाइल बनाएँ और पसंदीदा सर्वर से अपने-आप कनेक्ट हों।
-◆ Basic Auth का समर्थन, जिसमें OPENCODE_SERVER_PASSWORD के साथ कॉन्फ़िगर किए गए OpenCode सर्वर शामिल हैं।
+◆ QR कोड स्कैन करके या लिंक पेस्ट करके OpenCode v2 से पेयर करें। पासवर्ड से सुरक्षित सर्वर और OpenCode v1 के साथ भी काम करता है।
 ◆ ऐप से ही सर्वर मैनेज करें: नीचे खींचें, रिफ़्रेश करें या मेनू खोलें।
 ◆ सर्वर की उपलब्धता की अपने-आप जाँच और बढ़ते अंतराल के साथ दोबारा कनेक्ट करने की सुविधा।
 ◆ पासवर्ड डिवाइस पर सुरक्षित रूप से स्टोर होते हैं।
@@ -190,6 +220,16 @@ https://github.com/bmpenuelas/opencode-mobile-client
 ऐप इस्तेमाल करने के लिए OpenCode सर्वर का चलना ज़रूरी है।
 
 OpenCode Mobile एक क्लाइंट है जो उस कंप्यूटर पर चल रहे OpenCode वेब सर्वर से जुड़ता है जहाँ आपका कोड और डेवलपमेंट टूल्स मौजूद हैं।
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+फिर ऐप में सर्वर जोड़ें और QR कोड स्कैन करें या लिंक पेस्ट करें। लिंक एक बार चलते हैं और 5 मिनट में समाप्त हो जाते हैं।
+
+क्या आप opencode serve सीधे चला रहे हैं? “इसके बजाय URL और पासवर्ड का उपयोग करें” चुनें और दिखाया गया पासवर्ड डालें।
+
+OpenCode v1: सर्वर जोड़ते समय “OpenCode v1 सर्वर” चालू करें और इसे ऐसे शुरू करें:
 
 बिना ऑथेंटिकेशन:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -222,7 +262,7 @@ FUNCIONALIDADES:
 
 ◆ Ligação a qualquer servidor OpenCode através de HTTP ou HTTPS, na rede local ou à distância por VPN ou Tailscale.
 ◆ Vários perfis de servidor e ligação automática ao servidor preferido.
-◆ Suporte para autenticação Basic, incluindo servidores OpenCode configurados com OPENCODE_SERVER_PASSWORD.
+◆ Emparelhe com o OpenCode v2 lendo um código QR ou colando uma ligação. Também funciona com servidores protegidos por palavra-passe e com o OpenCode v1.
 ◆ Gestão de servidores na própria app: puxe para baixo, atualize ou abra o menu.
 ◆ Verificações automáticas do servidor e nova ligação com intervalos progressivos.
 ◆ Palavras-passe guardadas em segurança no dispositivo.
@@ -240,6 +280,16 @@ COMEÇAR RAPIDAMENTE:
 É necessário ter um servidor OpenCode a correr para utilizar a app.
 
 O OpenCode Mobile é um cliente que se liga ao servidor Web OpenCode em execução no computador onde tem o código e as ferramentas de desenvolvimento.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Depois, na app, adicione um servidor e leia o código QR ou cole uma ligação. As ligações funcionam uma vez e expiram ao fim de 5 minutos.
+
+Executa o opencode serve diretamente? Escolha “Usar URL e senha” e introduza a palavra-passe apresentada.
+
+OpenCode v1: Ao adicionar o servidor, ative “Servidor OpenCode v1” e inicie-o assim:
 
 Sem autenticação:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -272,7 +322,7 @@ OpenCode Mobile
 
 ◆ Подключение к любому серверу OpenCode по HTTP или HTTPS — в локальной сети или удалённо через VPN либо Tailscale.
 ◆ Несколько профилей серверов и автоматическое подключение к выбранному серверу.
-◆ Поддержка Basic Auth, в том числе серверов OpenCode, настроенных с OPENCODE_SERVER_PASSWORD.
+◆ Сопряжение с OpenCode v2 по QR-коду или ссылке. Также работает с серверами, защищёнными паролем, и с OpenCode v1.
 ◆ Управление серверами прямо в приложении: потяните вниз, обновите или откройте меню.
 ◆ Автоматическая проверка доступности сервера и повторное подключение с увеличивающимися интервалами.
 ◆ Безопасное хранение паролей на устройстве.
@@ -290,6 +340,16 @@ https://github.com/bmpenuelas/opencode-mobile-client
 Для работы приложения нужен запущенный сервер OpenCode.
 
 OpenCode Mobile — это клиент, который подключается к веб-серверу OpenCode на компьютере, где находятся ваш код и инструменты разработки.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Затем добавьте сервер в приложении и отсканируйте QR-код или вставьте ссылку. Ссылки одноразовые и действуют 5 минут.
+
+Запускаете opencode serve напрямую? Выберите «Использовать URL и пароль» и введите показанный пароль.
+
+OpenCode v1: При добавлении сервера включите «Сервер OpenCode v1» и запустите его так:
 
 Без аутентификации:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -322,7 +382,7 @@ OpenCode Mobile
 
 ◆ 通过 HTTP 或 HTTPS 连接任意 OpenCode 服务器；支持局域网、VPN 或 Tailscale 远程访问。
 ◆ 创建多个服务器配置，并自动连接到常用服务器。
-◆ 支持 Basic Auth，包括使用 OPENCODE_SERVER_PASSWORD 配置的 OpenCode 服务器。
+◆ 扫描二维码或粘贴链接即可与 OpenCode v2 配对，也支持受密码保护的服务器和 OpenCode v1。
 ◆ 在应用内管理服务器：下拉即可管理或刷新，也可以打开菜单操作。
 ◆ 自动检查服务器状态，并以逐步延长的间隔重新连接。
 ◆ 密码安全保存在设备上。
@@ -340,6 +400,16 @@ https://github.com/bmpenuelas/opencode-mobile-client
 使用本应用前，需要先运行 OpenCode 服务器。
 
 OpenCode Mobile 是一个客户端，用于连接运行在电脑上的 OpenCode Web 服务器；该电脑应具备你的代码和开发工具。
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+然后在应用中添加服务器，并扫描二维码或粘贴链接。链接仅可使用一次，5 分钟后失效。
+
+直接运行 opencode serve？请选择“改用 URL 和密码”，并输入它显示的密码。
+
+OpenCode v1: 添加服务器时，请开启“OpenCode v1 服务器”，然后这样启动：
 
 无需认证：
 opencode web --hostname 0.0.0.0 --port 4096
@@ -372,7 +442,7 @@ PCとスマートフォンをシームレスに行き来できます。デスク
 
 ◆ HTTPまたはHTTPSで任意のOpenCodeサーバーに接続。ローカルネットワーク、VPN、Tailscale経由のリモート接続に対応。
 ◆ 複数のサーバープロファイルを作成し、よく使うサーバーへ自動接続。
-◆ OPENCODE_SERVER_PASSWORDで設定したOpenCodeサーバーを含むBasic Authに対応。
+◆ QRコードのスキャンまたはリンクの貼り付けでOpenCode v2とペアリング。パスワード保護されたサーバーやOpenCode v1にも対応。
 ◆ アプリ内でサーバーを管理。下に引っ張って管理・更新するか、メニューを開いて操作できます。
 ◆ サーバーの状態を自動確認し、待機時間を徐々に延ばしながら再接続。
 ◆ パスワードはAndroidの安全なストレージに保存。
@@ -390,6 +460,16 @@ https://github.com/bmpenuelas/opencode-mobile-client
 本アプリを使うには、OpenCodeサーバーを起動しておく必要があります。
 
 OpenCode Mobileは、コードと開発ツールがあるコンピュータ上で動作するOpenCode Webサーバーに接続するクライアントです。
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+次にアプリでサーバーを追加し、QRコードをスキャンするかリンクを貼り付けます。リンクは1回のみ有効で、5分で期限切れになります。
+
+opencode serveを直接実行している場合は、「Use URL and password instead」を選び、表示されたパスワードを入力してください。
+
+OpenCode v1: サーバーの追加時に「OpenCode v1 server」をオンにし、次のように起動します：
 
 認証なし：
 opencode web --hostname 0.0.0.0 --port 4096
@@ -422,7 +502,7 @@ OpenCode Mobile로 언제 어디서나 OpenCode 에이전트를 사용할 수 �
 
 ◆ HTTP 또는 HTTPS로 모든 OpenCode 서버에 연결. 로컬 네트워크는 물론 VPN 또는 Tailscale을 통한 원격 연결도 지원합니다.
 ◆ 여러 서버 프로필을 만들고 자주 쓰는 서버에 자동으로 연결합니다.
-◆ OPENCODE_SERVER_PASSWORD로 구성한 OpenCode 서버를 포함해 Basic Auth를 지원합니다.
+◆ QR 코드를 스캔하거나 링크를 붙여넣어 OpenCode v2와 페어링합니다. 비밀번호로 보호된 서버와 OpenCode v1도 지원합니다.
 ◆ 앱 안에서 서버를 관리하세요. 아래로 당겨 관리하거나 새로 고치고, 메뉴를 열어 추가 작업을 할 수 있습니다.
 ◆ 서버 상태를 자동으로 확인하고, 대기 시간을 늘려 가며 재연결합니다.
 ◆ 비밀번호는 Android의 보안 저장소에 안전하게 저장됩니다.
@@ -440,6 +520,16 @@ https://github.com/bmpenuelas/opencode-mobile-client
 앱을 사용하려면 OpenCode 서버가 실행 중이어야 합니다.
 
 OpenCode Mobile은 코드와 개발 도구가 있는 컴퓨터에서 실행되는 OpenCode 웹 서버에 연결하는 클라이언트입니다.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+그런 다음 앱에서 서버를 추가하고 QR 코드를 스캔하거나 링크를 붙여넣으세요. 링크는 한 번만 사용할 수 있으며 5분 후 만료됩니다.
+
+opencode serve를 직접 실행하나요? "Use URL and password instead"를 선택하고 표시된 비밀번호를 입력하세요.
+
+OpenCode v1: 서버를 추가할 때 "OpenCode v1 server"를 켜고 다음과 같이 시작하세요:
 
 인증 없이 사용:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -472,7 +562,7 @@ FUNZIONALITÀ:
 
 ◆ Connessione a qualsiasi server OpenCode tramite HTTP o HTTPS, sulla rete locale o da remoto via VPN o Tailscale.
 ◆ Più profili server e connessione automatica al server preferito.
-◆ Supporto per Basic Auth, compresi i server OpenCode configurati con OPENCODE_SERVER_PASSWORD.
+◆ Associa OpenCode v2 scansionando un codice QR o incollando un link. Funziona anche con server protetti da password e con OpenCode v1.
 ◆ Gestisci i server direttamente dall’app: tira verso il basso, aggiorna oppure apri il menu.
 ◆ Controlli automatici dello stato del server e riconnessione con intervalli progressivi.
 ◆ Password archiviate in modo sicuro nella memoria protetta di Android.
@@ -490,6 +580,16 @@ PER INIZIARE:
 Per usare l’app è necessario avere un server OpenCode in esecuzione.
 
 OpenCode Mobile è un client che si collega al server web OpenCode in esecuzione sul computer in cui si trovano il tuo codice e gli strumenti di sviluppo.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Poi, nell’app, aggiungi un server e scansiona il codice QR o incolla un link. I link funzionano una sola volta e scadono dopo 5 minuti.
+
+Esegui direttamente opencode serve? Scegli "Use URL and password instead" e inserisci la password mostrata.
+
+OpenCode v1: Quando aggiungi il server, attiva "OpenCode v1 server" e avvialo così:
 
 Senza autenticazione:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -522,7 +622,7 @@ Bilgisayar ve telefon arasında akıcı şekilde geçiş yapın: masaüstünde b
 
 ◆ Herhangi bir OpenCode sunucusuna HTTP veya HTTPS ile bağlanın; yerel ağda ya da VPN veya Tailscale üzerinden uzaktan çalışın.
 ◆ Birden fazla sunucu profili oluşturun ve tercih ettiğiniz sunucuya otomatik bağlanın.
-◆ OPENCODE_SERVER_PASSWORD ile yapılandırılmış OpenCode sunucuları dahil Basic Auth desteği.
+◆ QR kodu tarayarak veya bağlantı yapıştırarak OpenCode v2 ile eşleştirin. Parola korumalı sunucularla ve OpenCode v1 ile de çalışır.
 ◆ Sunucuları uygulama içinden yönetin: aşağı çekin, yenileyin veya menüyü açın.
 ◆ Otomatik sunucu durum kontrolleri ve giderek artan bekleme süreleriyle yeniden bağlanma.
 ◆ Parolalar Android’in güvenli depolama alanında korunur.
@@ -540,6 +640,16 @@ HIZLI BAŞLANGIÇ:
 Uygulamayı kullanmak için çalışan bir OpenCode sunucusu gerekir.
 
 OpenCode Mobile, kodunuzun ve geliştirme araçlarınızın bulunduğu bilgisayarda çalışan OpenCode web sunucusuna bağlanan bir istemcidir.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Ardından uygulamada bir sunucu ekleyip QR kodu tarayın veya bir bağlantı yapıştırın. Bağlantılar bir kez çalışır ve 5 dakika sonra geçerliliğini yitirir.
+
+opencode serve komutunu doğrudan mı çalıştırıyorsunuz? "Use URL and password instead" seçeneğini seçip gösterilen parolayı girin.
+
+OpenCode v1: Sunucuyu eklerken "OpenCode v1 server" seçeneğini açın ve şöyle başlatın:
 
 Kimlik doğrulama olmadan:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -572,7 +682,7 @@ FITUR:
 
 ◆ Terhubung ke server OpenCode mana pun melalui HTTP atau HTTPS, di jaringan lokal maupun dari jauh lewat VPN atau Tailscale.
 ◆ Buat beberapa profil server dan terhubung otomatis ke server pilihan Anda.
-◆ Dukungan Basic Auth, termasuk server OpenCode yang dikonfigurasi dengan OPENCODE_SERVER_PASSWORD.
+◆ Pasangkan dengan OpenCode v2 dengan memindai kode QR atau menempelkan tautan. Juga berfungsi dengan server yang dilindungi kata sandi dan OpenCode v1.
 ◆ Kelola server dari dalam aplikasi: tarik ke bawah, segarkan, atau buka menu.
 ◆ Pemeriksaan kondisi server otomatis dan penyambungan kembali dengan jeda yang makin panjang.
 ◆ Kata sandi disimpan dengan aman di penyimpanan aman Android.
@@ -590,6 +700,16 @@ MULAI CEPAT:
 Server OpenCode harus berjalan untuk menggunakan aplikasi ini.
 
 OpenCode Mobile adalah klien yang terhubung ke server web OpenCode yang berjalan di komputer tempat kode dan alat pengembangan Anda berada.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Lalu di aplikasi, tambahkan server dan pindai kode QR atau tempelkan tautan. Tautan hanya bisa dipakai sekali dan kedaluwarsa setelah 5 menit.
+
+Menjalankan opencode serve secara langsung? Pilih "Use URL and password instead" dan masukkan kata sandi yang ditampilkan.
+
+OpenCode v1: Saat menambahkan server, aktifkan "OpenCode v1 server" dan jalankan seperti ini:
 
 Tanpa autentikasi:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -622,7 +742,7 @@ OpenCode Mobile พาเอเจนต์ OpenCode ของคุณมาไ
 
 ◆ เชื่อมต่อกับเซิร์ฟเวอร์ OpenCode ใดก็ได้ผ่าน HTTP หรือ HTTPS ทั้งบนเครือข่ายภายในและจากระยะไกลผ่าน VPN หรือ Tailscale
 ◆ สร้างโปรไฟล์เซิร์ฟเวอร์ได้หลายรายการ และเชื่อมต่อกับเซิร์ฟเวอร์ที่ต้องการโดยอัตโนมัติ
-◆ รองรับ Basic Auth รวมถึงเซิร์ฟเวอร์ OpenCode ที่ตั้งค่าด้วย OPENCODE_SERVER_PASSWORD
+◆ จับคู่กับ OpenCode v2 ด้วยการสแกนคิวอาร์โค้ดหรือวางลิงก์ และยังใช้กับเซิร์ฟเวอร์ที่ป้องกันด้วยรหัสผ่านและ OpenCode v1 ได้
 ◆ จัดการเซิร์ฟเวอร์ในแอปได้เลย: ดึงลงเพื่อจัดการหรือรีเฟรช หรือเปิดเมนูเพื่อดำเนินการ
 ◆ ตรวจสอบสถานะเซิร์ฟเวอร์อัตโนมัติ และเชื่อมต่อใหม่ด้วยช่วงเวลารอที่ค่อย ๆ เพิ่มขึ้น
 ◆ เก็บรหัสผ่านไว้อย่างปลอดภัยในพื้นที่จัดเก็บที่ปลอดภัยของ Android
@@ -640,6 +760,16 @@ https://github.com/bmpenuelas/opencode-mobile-client
 ต้องมีเซิร์ฟเวอร์ OpenCode ที่กำลังทำงานอยู่จึงจะใช้แอปได้
 
 OpenCode Mobile เป็นไคลเอนต์ที่เชื่อมต่อกับ OpenCode Web server ที่ทำงานอยู่บนคอมพิวเตอร์ซึ่งมีโค้ดและเครื่องมือพัฒนาของคุณ
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+จากนั้นเพิ่มเซิร์ฟเวอร์ในแอป แล้วสแกนคิวอาร์โค้ดหรือวางลิงก์ ลิงก์ใช้ได้ครั้งเดียวและหมดอายุใน 5 นาที
+
+หากเรียกใช้ opencode serve โดยตรง ให้เลือก "Use URL and password instead" แล้วป้อนรหัสผ่านที่แสดง
+
+OpenCode v1: เมื่อเพิ่มเซิร์ฟเวอร์ ให้เปิด "OpenCode v1 server" แล้วเริ่มเซิร์ฟเวอร์ดังนี้:
 
 ไม่ใช้การยืนยันตัวตน:
 opencode web --hostname 0.0.0.0 --port 4096
@@ -672,7 +802,7 @@ TÍNH NĂNG:
 
 ◆ Kết nối với mọi máy chủ OpenCode qua HTTP hoặc HTTPS, trong mạng cục bộ hoặc từ xa qua VPN hay Tailscale.
 ◆ Tạo nhiều cấu hình máy chủ và tự động kết nối tới máy chủ bạn ưu tiên.
-◆ Hỗ trợ Basic Auth, bao gồm máy chủ OpenCode được cấu hình bằng OPENCODE_SERVER_PASSWORD.
+◆ Ghép nối với OpenCode v2 bằng cách quét mã QR hoặc dán liên kết. Cũng hoạt động với máy chủ có mật khẩu và OpenCode v1.
 ◆ Quản lý máy chủ ngay trong ứng dụng: kéo xuống, làm mới hoặc mở menu.
 ◆ Tự động kiểm tra trạng thái máy chủ và kết nối lại với thời gian chờ tăng dần.
 ◆ Mật khẩu được lưu an toàn trong bộ nhớ bảo mật của Android.
@@ -690,6 +820,16 @@ BẮT ĐẦU NHANH:
 Bạn cần có máy chủ OpenCode đang chạy để sử dụng ứng dụng.
 
 OpenCode Mobile là ứng dụng khách kết nối tới máy chủ web OpenCode đang chạy trên máy tính chứa mã và công cụ phát triển của bạn.
+
+OpenCode v2:
+opencode service set hostname 0.0.0.0
+opencode pair
+
+Sau đó, trong ứng dụng, hãy thêm máy chủ rồi quét mã QR hoặc dán liên kết. Liên kết chỉ dùng được một lần và hết hạn sau 5 phút.
+
+Bạn chạy trực tiếp opencode serve? Hãy chọn "Use URL and password instead" và nhập mật khẩu được hiển thị.
+
+OpenCode v1: Khi thêm máy chủ, hãy bật "OpenCode v1 server" và khởi động như sau:
 
 Không xác thực:
 opencode web --hostname 0.0.0.0 --port 4096

@@ -12,10 +12,14 @@
 
     <div v-else-if="errorText" class="flex flex-col items-center gap-4 text-center max-w-[300px]">
       <p class="text-sm text-muted-foreground leading-relaxed">{{ errorText }}</p>
-      <div class="flex gap-2">
+      <p v-if="connectionTip && connectionStore.state === 'unreachable'" class="text-xs text-muted-foreground leading-relaxed">{{ t(connectionTip.textKey) }}</p>
+      <CommandChip v-if="connectionTip?.command" class="w-full" :command="connectionTip.command" />
+      <div class="flex flex-wrap justify-center gap-2">
         <Button @click="retry">{{ t('common.retry') }}</Button>
+        <Button v-if="connectionTip?.canEdit" variant="outline" @click="editServer">{{ t('common.edit') }}</Button>
         <Button variant="outline" @click="goHome">{{ t('common.back') }}</Button>
       </div>
+      <Button variant="ghost" size="sm" class="text-muted-foreground" @click="openHelp">{{ t('common.help') }}</Button>
     </div>
   </div>
 </template>
@@ -24,6 +28,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
+import CommandChip from '@/components/CommandChip.vue'
 import DemoSessionMock from '@/components/DemoSessionMock.vue'
 import { InAppBrowser, ToolBarType, BackgroundColor } from '@capgo/capacitor-inappbrowser'
 import { Capacitor } from '@capacitor/core'
@@ -33,6 +38,7 @@ import { useConnectionStore } from '@/stores/connectionStore'
 import { registerBackButton, unregisterBackButton } from '@/services/platform/backButton'
 import { buildIframeUrl } from '@/services/opencode/url'
 import { buildPairingConnectUrl, mintPairingCode } from '@/services/opencode/pairing'
+import { serverTip } from '@/services/opencode/setupTips'
 import { isDemoModeServer } from '@/services/opencode/demoMode'
 import {
   approveNativeNotificationsFromPrompt,
@@ -55,6 +61,7 @@ const errorText = ref('')
 const serverId = computed(() => route.params.id as string)
 const profile = computed(() => serverStore.profiles.find(p => p.id === serverId.value))
 const demoModeActive = ref(false)
+const connectionTip = computed(() => profile.value ? serverTip(profile.value, connectionStore.state) : null)
 
 let browserClosedHandle: any = null
 let pageLoadedHandle: any = null
@@ -725,6 +732,12 @@ async function retry(): Promise<void> {
 }
 
 function goHome(): void { connectionStore.disconnect(); router.push('/') }
+function openHelp(): void { connectionStore.disconnect(); router.push('/help') }
+function editServer(): void {
+  const id = serverId.value
+  connectionStore.disconnect()
+  router.push(`/servers/${id}/edit`)
+}
 async function handleBackButton(): Promise<boolean> {
   try { await InAppBrowser.close() } catch {}
   connectionStore.disconnect()

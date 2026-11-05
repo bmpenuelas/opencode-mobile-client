@@ -65,6 +65,8 @@
           <Badge v-if="profile.serverVersion === 'v1'" variant="outline">v1</Badge>
           <Badge v-if="profile.authEnabled" variant="outline">{{ t('form.authentication') }}</Badge>
           <span class="ml-auto text-xs text-muted-foreground self-center">{{ statusLabel(profileStatus(profile)) }}</span>
+          <ServerTip class="mt-1" :profile="profile" :status="profileStatus(profile)" />
+          <p v-if="profile.serverVersion === 'v1'" class="mt-1 w-full text-xs leading-relaxed text-muted-foreground">{{ t('tips.v1Upgrade') }}</p>
         </CardContent>
         <CardFooter class="gap-0.5">
           <Button variant="ghost" size="sm" @click.stop="editServer(profile.id)">{{ t('common.edit') }}</Button>
@@ -90,6 +92,7 @@ import { useConnectionStore } from '@/stores/connectionStore'
 import { sanitizeUrlForDisplay } from '@/services/opencode/url'
 import { useServerHealthPoll } from '@/composables/useServerHealthPoll'
 import type { ServerProfile } from '@/types'
+import ServerTip from './ServerTip.vue'
 import StatusDot from './StatusDot.vue'
 import { useI18n } from '@/i18n'
 

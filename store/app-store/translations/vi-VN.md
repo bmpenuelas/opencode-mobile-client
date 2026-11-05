@@ -26,7 +26,7 @@ TÍNH NĂNG:
 
 ◆ Kết nối với mọi máy chủ OpenCode qua HTTP hoặc HTTPS, trong mạng cục bộ hoặc từ xa qua VPN hay Tailscale.
 ◆ Tạo nhiều cấu hình máy chủ và tự động kết nối tới máy chủ bạn ưu tiên.
-◆ Hỗ trợ Basic Auth, bao gồm máy chủ OpenCode được cấu hình bằng OPENCODE_SERVER_PASSWORD.
+◆ Ghép nối với OpenCode v2 bằng cách quét mã QR hoặc dán liên kết. Cũng hoạt động với máy chủ có mật khẩu và OpenCode v1.
 ◆ Quản lý máy chủ ngay trong ứng dụng: kéo xuống, làm mới hoặc mở menu.
 ◆ Tự động kiểm tra trạng thái máy chủ và kết nối lại với thời gian chờ tăng dần.
 ◆ Mật khẩu được lưu an toàn trong Keychain.
@@ -46,6 +46,22 @@ BẮT ĐẦU NHANH:
 Bạn cần có máy chủ OpenCode đang chạy để sử dụng ứng dụng.
 
 OpenCode Mobile là ứng dụng khách kết nối tới máy chủ web OpenCode đang chạy trên máy tính chứa mã và công cụ phát triển của bạn.
+
+► OpenCode v2
+
+Chạy hai lệnh sau trên máy tính của bạn:
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+Sau đó, trong ứng dụng, hãy thêm máy chủ rồi quét mã QR hoặc dán liên kết. Liên kết chỉ dùng được một lần và hết hạn sau 5 phút.
+
+Bạn chạy trực tiếp opencode serve? Hãy chọn "Use URL and password instead" và nhập mật khẩu được hiển thị.
+
+► OpenCode v1
+
+Khi thêm máy chủ, hãy bật "OpenCode v1 server" và khởi động như sau:
 
 ► Không xác thực
 

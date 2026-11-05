@@ -16,7 +16,8 @@ Chat with your agents from your phone while they and the server run on your comp
 - ⌨️ Toggleable Enter=newline mode (Enter inserts a newline, Shift+Enter sends the prompt)
 - 📱 Injects narrow-screen fixes to the stock OpenCode web UI
 - 📋 Multiple server profiles with auto-connect support
-- 🔗 Pair with OpenCode v2 servers using a link from `opencode pair`
+- 🔗 Pair with OpenCode v2 by scanning the QR code from `opencode pair` or pasting a link
+- 💡 Setup tips in the app that show what to run on your computer and what to check when something fails
 - 🕰️ OpenCode v1 servers still supported: mark the server as v1 when adding it
 - 🔑 Password support (matching OpenCode's `OPENCODE_SERVER_PASSWORD`)
 - 🎛️ Pull-down menu for server management while connected. Pull to refresh, tap ⋮ to open menu.
@@ -32,27 +33,45 @@ Chat with your agents from your phone while they and the server run on your comp
 
 ---
 
-## How to start your OpenCode Server (REQUIRED TO USE THE APP❗)
+## How to set up your OpenCode server (REQUIRED TO USE THE APP❗)
 
-The app is a client that connects to a opencode web server running on the machine where you have your code and build tools. It needs a running web server to connect to.
+The app is a client. It connects to OpenCode running on the machine where you have your code and build tools, so that needs to be set up first. The app shows these steps too when you add a server.
 
 ### OpenCode v2 (default)
 
-Let other devices connect to the background service, then create a pairing link:
+1. Let other devices reach the background service. You only need to do this once:
 
 ```bash
 opencode service set hostname 0.0.0.0
 ```
 
+2. Print a QR code and pairing links. This starts the service if it isn't running:
+
 ```bash
 opencode pair
 ```
+
+3. Pair from the app, on the same Wi-Fi or VPN as your computer.
 
 In the app, tap **Add server**, then tap **Scan QR code** to scan the code that `opencode pair` prints, or paste one of the printed links. Links work once and expire after 5 minutes. The app then keeps a session that it renews as you use it, so you only pair once. If you don't connect for 30 days, or the server password changes, pair again from **Edit server**.
 
 The QR code holds JSON rather than a link, so your phone's camera app won't open it. Scan it from the app instead. On Android, the app can't read the code on a light terminal theme, where it comes out light-on-dark. Switch to a dark theme or paste a link.
 
-A standalone `opencode serve` can't pair. Use **Use URL and password instead** with the password it prints. Find more options in the [official docs](https://opencode.ai/v2/docs/cli/web/).
+#### Using `opencode serve` instead
+
+A standalone server can't pair. Start it, then choose **Use URL and password instead** in the app and enter the password it prints:
+
+```bash
+opencode serve --hostname 0.0.0.0 --port 4096
+```
+
+To choose the password yourself, set `OPENCODE_PASSWORD` first. The username is always `opencode`.
+
+#### Away from home
+
+Use a VPN such as Tailscale on both devices. You can also run `opencode pair --remote`, which reaches your computer through a tunnel. That exposes the server to the internet, protected by its password, and OpenCode asks you to confirm it the first time.
+
+Find more options in the [official docs](https://opencode.ai/v2/docs/cli/web/).
 
 ### OpenCode v1
 
@@ -79,8 +98,8 @@ When auth is enabled, the username defaults to `opencode` in the app. Find more 
 
 ### Cannot connect
 
-- Verify the server is running: `opencode serve --hostname 0.0.0.0 --port 4096`
-- Verify the URL is correct. Try `curl http://your-server:4096/` from another device on the same network.
+- Verify the server is running. On v2, `opencode service status` shows the address, or `stopped`. If you started `opencode serve` yourself, check that terminal.
+- Verify the URL is correct. Try `curl http://your-server:4096/api/info` from another device on the same network. Any HTTP answer, even a 401, means the server is reachable.
 - Check that the port is not firewalled.
 - Ensure the server is listening on `0.0.0.0` (not `127.0.0.1`, which would only accept local connections).
 
@@ -88,6 +107,8 @@ When auth is enabled, the username defaults to `opencode` in the app. Find more 
 
 - Links work once and expire after 5 minutes. Run `opencode pair` again for a new one.
 - If the link starts with `http://127.0.0.1`, the server only accepts local connections. Run `opencode service set hostname 0.0.0.0`, then `opencode pair` again.
+- If your phone can't reach the address in the link, as can happen with WSL, Docker or a VPN name, choose it yourself: `opencode pair --url http://your-address:port`. On WSL, also make the port reachable from your network, for example with [mirrored networking](https://learn.microsoft.com/windows/wsl/networking#mirrored-mode-networking).
+- On Android, the app can't read the QR code from a light terminal theme. Use a dark theme, or paste the link.
 
 ### Wrong server version
 
@@ -96,12 +117,13 @@ When auth is enabled, the username defaults to `opencode` in the app. Find more 
 ### Auth required
 
 - The server returned HTTP 401 and no password is stored in the app.
-- Go to Edit Server and set the password that matches `OPENCODE_SERVER_PASSWORD`.
+- Go to Edit Server and pair it with a new link, or set the password the server uses.
 
 ### Wrong credentials
 
 - The stored username or password does not match the server.
-- Try connecting with the correct credentials via curl first: `curl -u opencode:your-password http://server:4096/`
+- On a paired server, the session has expired or the server password changed. Run `opencode pair`, then go to Edit Server and add the new link.
+- Try connecting with the correct credentials via curl first: `curl -u opencode:your-password http://server:4096/api/info`
 
 ### Blank iframe
 

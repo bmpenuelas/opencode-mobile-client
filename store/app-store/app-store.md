@@ -22,7 +22,7 @@ FEATURES:
 
 ◆ Connect to any OpenCode server over HTTP or HTTPS, whether on your local network or remotely through a VPN such as Tailscale.
 ◆ Create multiple server profiles and automatically connect to your preferred server.
-◆ Basic Auth support, including OpenCode servers configured with OPENCODE_SERVER_PASSWORD.
+◆ Pair with OpenCode v2 by scanning a QR code or pasting a link. Also works with password-protected servers and OpenCode v1.
 ◆ Pull down while connected to access server management. Pull to refresh or open the menu to switch and manage servers.
 ◆ Automatic server health checks with exponential reconnect when the connection is interrupted.
 ◆ Secure password storage using Keychain.
@@ -41,7 +41,23 @@ https://github.com/bmpenuelas/opencode-mobile-client
 
 An OpenCode server is required to use the app.
 
-The app acts as a client and connects to an OpenCode web server running on the computer where your source code and development tools are located.
+The app acts as a client and connects to OpenCode running on the computer where your source code and development tools are located.
+
+► OpenCode v2
+
+Run these two commands on your computer:
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+Then, in the app, add a server and scan the QR code or paste a link. Links work once and expire after 5 minutes.
+
+Running opencode serve directly? Choose "Use URL and password instead" and enter the password it prints.
+
+► OpenCode v1
+
+When adding the server, turn on "OpenCode v1 server" and start it like this:
 
 ► Without authentication
 
@@ -82,7 +98,7 @@ No VPN-related information is collected or used for any purpose. (the app does n
 Is this data shared with third parties or stored elsewhere?
 No. The app does not have any VPN functionality. So no VPN data is collected and therefore no VPN-related data is shared with third parties or stored on developer-controlled servers.
 
-The app stores user-configured server profile details locally on the device: profile name, server URL, and username in local app storage; passwords are stored in the iOS Keychain. The app has no developer-operated backend, analytics, advertising, or crash-reporting service.
+The app stores user-configured server profile details locally on the device: profile name, server URL, and username in local app storage; passwords and pairing session tokens are stored in the iOS Keychain. The app has no developer-operated backend, analytics, advertising, or crash-reporting service.
 When a user connects, requests are sent directly to the OpenCode server they configured and control. Any data handled by that server is governed by that server owner’s practices, not collected by this app.
 
 1- Regarding Guideline 2.3.10 - Performance - Accurate Metadata

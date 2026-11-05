@@ -6,7 +6,7 @@
 |---|--------|-------|--------|
 | 1 | Landing — default server ready to connect | `/` | Phone |
 | 2 | Server list with profiles | `/servers` | Phone |
-| 3 | Add server form (URL + auth fields filled) | `/servers/new` | Phone |
+| 3 | Add server form (setup steps and pairing link) | `/servers/new` | Phone |
 | 4 | Active connection — OpenCode Web UI loaded | `/connect/:id` | Phone |
 | 5 | Active connection — TopPullMenu open | `/connect/:id` | Phone |
 | 6 | Settings screen | `/settings` | Phone |
@@ -45,7 +45,7 @@
 ### Phone screenshots
 - [ ] Landing (default server, ready state, green dot)
 - [ ] Server list (2+ profiles, mixed statuses)
-- [ ] Add server form (URL filled, auth toggled on)
+- [ ] Add server form (setup steps showing, pairing link filled)
 - [ ] WebView connected (OpenCode interface visible)
 - [ ] TopPullMenu (during active connection — shows Options panel)
 - [ ] Settings (timeout values visible)

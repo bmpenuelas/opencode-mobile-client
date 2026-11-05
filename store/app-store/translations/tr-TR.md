@@ -26,7 +26,7 @@ Bilgisayar ve telefon arasında akıcı şekilde geçiş yapın: masaüstünde b
 
 ◆ Herhangi bir OpenCode sunucusuna HTTP veya HTTPS ile bağlanın; yerel ağda ya da VPN veya Tailscale üzerinden uzaktan çalışın.
 ◆ Birden fazla sunucu profili oluşturun ve tercih ettiğiniz sunucuya otomatik bağlanın.
-◆ OPENCODE_SERVER_PASSWORD ile yapılandırılmış OpenCode sunucuları dahil Basic Auth desteği.
+◆ QR kodu tarayarak veya bağlantı yapıştırarak OpenCode v2 ile eşleştirin. Parola korumalı sunucularla ve OpenCode v1 ile de çalışır.
 ◆ Sunucuları uygulama içinden yönetin: aşağı çekin, yenileyin veya menüyü açın.
 ◆ Otomatik sunucu durum kontrolleri ve giderek artan bekleme süreleriyle yeniden bağlanma.
 ◆ Parolalar Keychain’de güvenle saklanır.
@@ -46,6 +46,22 @@ HIZLI BAŞLANGIÇ:
 Uygulamayı kullanmak için çalışan bir OpenCode sunucusu gerekir.
 
 OpenCode Mobile, kodunuzun ve geliştirme araçlarınızın bulunduğu bilgisayarda çalışan OpenCode web sunucusuna bağlanan bir istemcidir.
+
+► OpenCode v2
+
+Bilgisayarınızda şu iki komutu çalıştırın:
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+Ardından uygulamada bir sunucu ekleyip QR kodu tarayın veya bir bağlantı yapıştırın. Bağlantılar bir kez çalışır ve 5 dakika sonra geçerliliğini yitirir.
+
+opencode serve komutunu doğrudan mı çalıştırıyorsunuz? "Use URL and password instead" seçeneğini seçip gösterilen parolayı girin.
+
+► OpenCode v1
+
+Sunucuyu eklerken "OpenCode v1 server" seçeneğini açın ve şöyle başlatın:
 
 ► Kimlik doğrulama olmadan
 

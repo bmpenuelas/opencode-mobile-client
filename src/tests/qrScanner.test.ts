@@ -72,7 +72,7 @@ describe('qrScanner', () => {
 })
 
 describe('scan strings', () => {
-  const keys = ['form.pairingHintScan', 'form.scanQr', 'form.scanInstructions', 'form.scanDenied', 'form.scanInvalid', 'form.scanFailed']
+  const keys = ['tips.pair3Scan', 'form.scanQr', 'form.scanInstructions', 'form.scanDenied', 'form.scanInvalid', 'form.scanFailed']
 
   it('are translated in every catalog', () => {
     setLocale('en-US')

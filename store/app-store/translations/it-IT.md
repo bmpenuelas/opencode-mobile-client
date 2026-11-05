@@ -26,7 +26,7 @@ FUNZIONALITÀ:
 
 ◆ Connessione a qualsiasi server OpenCode tramite HTTP o HTTPS, sulla rete locale o da remoto via VPN o Tailscale.
 ◆ Più profili server e connessione automatica al server preferito.
-◆ Supporto per Basic Auth, compresi i server OpenCode configurati con OPENCODE_SERVER_PASSWORD.
+◆ Associa OpenCode v2 scansionando un codice QR o incollando un link. Funziona anche con server protetti da password e con OpenCode v1.
 ◆ Gestisci i server direttamente dall’app: tira verso il basso, aggiorna oppure apri il menu.
 ◆ Controlli automatici dello stato del server e riconnessione con intervalli progressivi.
 ◆ Password archiviate in modo sicuro nel portachiavi.
@@ -46,6 +46,22 @@ PER INIZIARE:
 Per usare l’app è necessario avere un server OpenCode in esecuzione.
 
 OpenCode Mobile è un client che si collega al server web OpenCode in esecuzione sul computer in cui si trovano il tuo codice e gli strumenti di sviluppo.
+
+► OpenCode v2
+
+Esegui questi due comandi sul computer:
+
+opencode service set hostname 0.0.0.0
+
+opencode pair
+
+Poi, nell’app, aggiungi un server e scansiona il codice QR o incolla un link. I link funzionano una sola volta e scadono dopo 5 minuti.
+
+Esegui direttamente opencode serve? Scegli "Use URL and password instead" e inserisci la password mostrata.
+
+► OpenCode v1
+
+Quando aggiungi il server, attiva "OpenCode v1 server" e avvialo così:
 
 ► Senza autenticazione
 
