@@ -9,6 +9,7 @@ export const supportedLocales = [
   { code: 'fr', label: 'Français' },
   { code: 'zh-Hans', label: '简体中文' },
   { code: 'ru', label: 'Русский' },
+  { code: 'ar', label: 'العربية' },
 ] as const
 
 export type Locale = typeof supportedLocales[number]['code']
@@ -28,6 +29,7 @@ function detectedLocale(): Locale {
   if (language.startsWith('fr')) return 'fr'
   if (language.startsWith('zh')) return 'zh-Hans'
   if (language.startsWith('ru')) return 'ru'
+  if (language.startsWith('ar')) return 'ar'
   return fallbackLocale
 }
 
@@ -43,6 +45,119 @@ const en: MessageCatalog = {
   'help.about': 'About', 'help.aboutText': 'A lightweight mobile client that opens the OpenCode Web interface on Android and iOS. It connects to an OpenCode server that is already running on your local network, VPN, or Tailscale.', 'help.requirements': 'What you need', 'help.requirementsText': '<strong>An OpenCode web server must already be running.</strong><br><br>Run it on the computer that has your code and build tools. Your phone needs to be able to reach that computer over your local network, VPN, or Tailscale when you are away.', 'help.startServer': 'Start your OpenCode server', 'help.noAuth': 'Without authentication', 'help.withAuth': 'With authentication (recommended)', 'help.authDefault': 'When authentication is on, the app uses <code>opencode</code> as the default username.', 'help.troubleshooting': 'Troubleshooting', 'help.cannotConnect': 'Can’t connect', 'help.cannotConnectText': 'Make sure the server is running, the URL and port are correct, and your phone can reach it. The server must listen on <code>0.0.0.0</code>, rather than only <code>127.0.0.1</code>.', 'help.authRequired': 'Authentication required', 'help.authRequiredText': 'The server returned HTTP 401 and the app has no saved password. Edit the server and enter the password configured in <code>OPENCODE_SERVER_PASSWORD</code>.', 'help.wrongCredentials': 'Incorrect credentials', 'help.wrongCredentialsText': 'The saved username or password does not match the server. Check the credentials, for example with <code>curl -u opencode:your-password http://server:4096/</code>.', 'help.blank': 'Blank web view', 'help.blankText': 'The server may send headers that prevent the page being embedded. Open it in the isolated native web view from the menu instead.', 'help.http': 'HTTP blocked on Android or iOS', 'help.httpText': '<strong>Android:</strong> allow cleartext traffic in <code>android:networkSecurityConfig</code>.<br><strong>iOS:</strong> enable <code>NSAllowsLocalNetworking</code> in <code>Info.plist</code>.', 'help.cors': 'Works in the app but not in browser development mode', 'help.corsText': 'That is expected: your development server has a different origin. Use a native build, or configure CORS on your OpenCode server.', 'help.issues': 'Issues and suggestions', 'help.issuesText': 'The project is open source on <a href="https://github.com/bmpenuelas/opencode-mobile-client" target="_blank" rel="noopener noreferrer" class="text-blue-700 dark:text-blue-400 no-underline font-semibold">GitHub</a>. Please open an issue there for problems or ideas, and contributions are always welcome.',
   'connection.loading': 'Loading OpenCode…', 'connection.opened': 'Opened in a new tab. Close it and return here.', 'connection.openFailed': 'Could not open the web viewer.', 'connection.unreachable': 'Server unreachable', 'menu.unknown': 'Unknown', 'menu.reconnect': 'Reconnect', 'menu.cancelReconnect': 'Cancel reconnect', 'menu.switch': 'Switch server', 'menu.editCurrent': 'Edit current server', 'menu.disconnect': 'Disconnect', 'menu.enterNewline': 'Enter = new line', 'menu.browser': 'Open in browser', 'menu.forward': 'Forward',
   'demo.title': 'OpenCode demo session', 'demo.online': 'Online', 'demo.you': 'You', 'demo.hint': 'Try asking about the repository, debugging an issue, or generating a patch.', 'demo.placeholder': 'Type a demo prompt…', 'demo.send': 'Send', 'demo.draft': 'Show me how this app connects to OpenCode.', 'demo.welcome': 'I traced the connection flow through the mobile client. The app loads the saved server profile, checks that it is reachable, and then opens the session in the native web-view shell.', 'demo.question': 'Can you inspect the mobile client and summarize how server connection works?', 'demo.response': 'Profiles are stored locally, connection state is managed in Pinia, and a successful check opens the full-screen session. Reconnect handling and periodic health checks keep the status current.', 'demo.fallback': 'I checked that path and the flow looks good. Next I would refine the experience and verify the connected state, retry behavior, and session shell.',
+}
+
+const ar: MessageCatalog = {
+  'common.back': 'رجوع',
+  'common.add': 'إضافة',
+  'common.cancel': 'إلغاء',
+  'common.confirm': 'تأكيد',
+  'common.close': 'إغلاق',
+  'common.delete': 'حذف',
+  'common.edit': 'تعديل',
+  'common.refresh': 'تحديث',
+  'common.retry': 'إعادة المحاولة',
+  'common.save': 'حفظ',
+  'common.settings': 'الإعدادات',
+  'common.help': 'المساعدة',
+  'status.connected': 'متصل',
+  'status.checking': 'جارٍ الفحص…',
+  'status.reconnecting': 'جارٍ إعادة الاتصال…',
+  'status.disconnected': 'غير متصل',
+  'status.unreachable': 'تعذّر الوصول',
+  'status.authRequired': 'المصادقة مطلوبة',
+  'status.wrongCredentials': 'بيانات الدخول غير صحيحة',
+  'status.blocked': 'محظور',
+  'status.offline': 'دون اتصال',
+  'status.ready': 'جاهز للاتصال',
+  'status.unknown': 'غير معروف',
+  'status.idle': 'في الانتظار',
+  'landing.tagline': 'اتصل بخوادم OpenCode أينما كنت',
+  'landing.noServer': 'لم يُعدّ أي خادم بعد',
+  'landing.connect': 'اتصال',
+  'landing.connectSignIn': 'اتصال وتسجيل الدخول',
+  'landing.addServer': 'إضافة خادم OpenCode',
+  'landing.addAnother': 'إضافة خادم آخر',
+  'landing.manageServers': 'إدارة الخوادم',
+  'servers.title': 'الخوادم',
+  'servers.empty': 'لا توجد خوادم معدّة',
+  'servers.addFirst': 'أضف خادمك الأول',
+  'servers.open': 'فتح الخادم',
+  'servers.default': 'افتراضي',
+  'servers.duplicate': 'تكرار',
+  'servers.setDefault': 'تعيين كافتراضي',
+  'servers.deleteConfirm': 'حذف «{name}»؟',
+  'form.addTitle': 'إضافة خادم',
+  'form.editTitle': 'تعديل الخادم',
+  'form.name': 'اسم الخادم',
+  'form.namePlaceholder': 'خادم OpenCode الخاص بي',
+  'form.url': 'عنوان URL للخادم',
+  'form.authentication': 'المصادقة مفعّلة',
+  'form.hide': 'إخفاء',
+  'form.show': 'إظهار',
+  'form.default': 'تعيين كخادم افتراضي',
+  'form.saving': 'جارٍ الحفظ…',
+  'form.saveChanges': 'حفظ التغييرات',
+  'form.nameRequired': 'أدخل اسم الخادم.',
+  'form.invalidUrl': 'أدخل عنوان URL صالحاً للخادم.',
+  'form.saveFailed': 'تعذّر حفظ الخادم.',
+  'settings.connection': 'الاتصال',
+  'settings.timeout': 'مهلة فحص الاتصال (ms)',
+  'settings.poll': 'الفاصل الزمني لفحص الاتصال (ms)',
+  'settings.reconnect': 'إعادة الاتصال تلقائياً بفواصل متزايدة',
+  'settings.notifications': 'الإشعارات',
+  'settings.enableNotifications': 'تفعيل الإشعارات',
+  'settings.notificationDescription': 'استقبل إشعارات الهاتف عند إبلاغ OpenCode Web عن موافقات معلّقة أو مهام مكتملة.',
+  'settings.language': 'اللغة',
+  'settings.about': 'حول',
+  'settings.aboutText': '<strong>عميل جوال لخوادم OpenCode.</strong> اتصل بنسخة OpenCode المستضافة ذاتياً عبر شبكتك المحلية أو VPN أو Tailscale. هذا مشروع مجتمعي مستقل ومفتوح المصدر—وليس تطبيق OpenCode رسمياً. تجد الشيفرة على <a href="https://github.com/bmpenuelas/opencode-mobile-client" target="_blank" rel="noopener noreferrer" class="text-blue-700 dark:text-blue-400 no-underline font-semibold">GitHub</a>، حيث نرحّب بتقارير الأخطاء وطلبات المزايا وطلبات الدمج. <span class="text-red-500">❤</span>',
+  'help.about': 'حول',
+  'help.aboutText': 'عميل جوال خفيف يفتح واجهة OpenCode Web على Android وiOS. يتصل بخادم OpenCode يعمل مسبقاً على شبكتك المحلية أو VPN أو Tailscale.',
+  'help.requirements': 'ما تحتاج إليه',
+  'help.requirementsText': '<strong>يجب أن يكون خادم OpenCode Web يعمل مسبقاً.</strong><br><br>شغّله على الحاسوب الذي يحتوي على شيفرتك وأدوات البناء. يحتاج هاتفك إلى الوصول إلى ذلك الحاسوب عبر شبكتك المحلية أو VPN أو Tailscale عندما تكون بعيداً.',
+  'help.startServer': 'تشغيل خادم OpenCode',
+  'help.noAuth': 'دون مصادقة',
+  'help.withAuth': 'مع المصادقة (موصى به)',
+  'help.authDefault': 'عند تفعيل المصادقة، يستخدم التطبيق <code>opencode</code> كاسم مستخدم افتراضي.',
+  'help.troubleshooting': 'استكشاف الأخطاء',
+  'help.cannotConnect': 'تعذّر الاتصال',
+  'help.cannotConnectText': 'تأكد من أن الخادم يعمل، وأن عنوان URL والمنفذ صحيحان، وأن هاتفك يستطيع الوصول إليه. يجب أن يستمع الخادم على <code>0.0.0.0</code> بدلاً من <code>127.0.0.1</code> فقط.',
+  'help.authRequired': 'المصادقة مطلوبة',
+  'help.authRequiredText': 'أعاد الخادم HTTP 401 ولا توجد كلمة مرور محفوظة في التطبيق. عدّل الخادم وأدخل كلمة المرور المضبوطة في <code>OPENCODE_SERVER_PASSWORD</code>.',
+  'help.wrongCredentials': 'بيانات دخول غير صحيحة',
+  'help.wrongCredentialsText': 'اسم المستخدم أو كلمة المرور المحفوظة لا تطابق الخادم. تحقق من البيانات، مثلاً عبر <code>curl -u opencode:your-password http://server:4096/</code>.',
+  'help.blank': 'عرض ويب فارغ',
+  'help.blankText': 'قد يرسل الخادم ترويسات تمنع تضمين الصفحة. افتحها في عرض الويب الأصلي المعزول من القائمة بدلاً من ذلك.',
+  'help.http': 'HTTP محظور على Android أو iOS',
+  'help.httpText': '<strong>Android:</strong> اسمح بمرور النص الواضح في <code>android:networkSecurityConfig</code>.<br><strong>iOS:</strong> فعّل <code>NSAllowsLocalNetworking</code> في <code>Info.plist</code>.',
+  'help.cors': 'يعمل في التطبيق لكن ليس في وضع تطوير المتصفح',
+  'help.corsText': 'هذا متوقع: خادم التطوير لديك له أصل مختلف. استخدم بناءً أصلياً، أو اضبط CORS على خادم OpenCode.',
+  'help.issues': 'المشكلات والاقتراحات',
+  'help.issuesText': 'المشروع مفتوح المصدر على <a href="https://github.com/bmpenuelas/opencode-mobile-client" target="_blank" rel="noopener noreferrer" class="text-blue-700 dark:text-blue-400 no-underline font-semibold">GitHub</a>. يرجى فتح مشكلة هناك للمشكلات أو الأفكار، والمساهمات مرحّب بها دائماً.',
+  'connection.loading': 'جارٍ تحميل OpenCode…',
+  'connection.opened': 'فُتح في علامة تبويب جديدة. أغلقها ثم عد إلى هنا.',
+  'connection.openFailed': 'تعذّر فتح عارض الويب.',
+  'connection.unreachable': 'تعذّر الوصول إلى الخادم',
+  'menu.unknown': 'غير معروف',
+  'menu.reconnect': 'إعادة الاتصال',
+  'menu.cancelReconnect': 'إلغاء إعادة الاتصال',
+  'menu.switch': 'تبديل الخادم',
+  'menu.editCurrent': 'تعديل الخادم الحالي',
+  'menu.disconnect': 'قطع الاتصال',
+  'menu.enterNewline': 'Enter = سطر جديد',
+  'menu.browser': 'فتح في المتصفح',
+  'menu.forward': 'التالي',
+  'demo.title': 'جلسة OpenCode التجريبية',
+  'demo.online': 'متصل',
+  'demo.you': 'أنت',
+  'demo.hint': 'جرّب السؤال عن المستودع، أو تصحيح مشكلة، أو إنشاء رقعة.',
+  'demo.placeholder': 'اكتب طلباً تجريبياً…',
+  'demo.send': 'إرسال',
+  'demo.draft': 'أرني كيف يتصل هذا التطبيق بـ OpenCode.',
+  'demo.welcome': 'تتبّعت مسار الاتصال عبر عميل الجوال. يحمّل التطبيق ملف الخادم المحفوظ، ويتحقق من إمكانية الوصول إليه، ثم يفتح الجلسة في غلاف عرض الويب الأصلي.',
+  'demo.question': 'هل يمكنك فحص عميل الجوال وتلخيص كيفية عمل الاتصال بالخادم؟',
+  'demo.response': 'تُحفظ الملفات محلياً، وتُدار حالة الاتصال عبر Pinia، ويفتح الفحص الناجح الجلسة بملء الشاشة. تحافظ معالجة إعادة الاتصال وفحوص الاتصال الدورية على تحديث الحالة.',
+  'demo.fallback': 'فحصت ذلك المسار ويبدو سليماً. سأصقل التجربة بعد ذلك وأتحقق من الحالة المتصلة وسلوك إعادة المحاولة وغلاف الجلسة.',
 }
 
 // Concise, idiomatic wording is preferable to literal translations in a compact mobile UI.
@@ -63,7 +178,7 @@ const zh: MessageCatalog = { 'common.back':'返回','common.add':'添加','commo
 const ru: MessageCatalog = { 'common.back':'Назад','common.add':'Добавить','common.cancel':'Отмена','common.confirm':'Подтвердить','common.close':'Закрыть','common.delete':'Удалить','common.edit':'Изменить','common.refresh':'Обновить','common.retry':'Повторить','common.save':'Сохранить','common.settings':'Настройки','common.help':'Справка','status.connected':'Подключено','status.checking':'Проверка…','status.reconnecting':'Переподключение…','status.disconnected':'Отключено','status.unreachable':'Недоступно','status.authRequired':'Требуется вход','status.wrongCredentials':'Неверные данные','status.blocked':'Заблокировано','status.offline':'Не в сети','status.ready':'Готово к подключению','status.unknown':'Неизвестно','status.idle':'Ожидание','landing.tagline':'Подключайтесь к серверам OpenCode где угодно','landing.noServer':'Сервер ещё не настроен','landing.connect':'Подключиться','landing.connectSignIn':'Подключиться и войти','landing.addServer':'Добавить сервер OpenCode','landing.addAnother':'Добавить ещё сервер','landing.manageServers':'Управление серверами','servers.title':'Серверы','servers.empty':'Нет настроенных серверов','servers.addFirst':'Добавьте первый сервер','servers.open':'Открыть сервер','servers.default':'По умолчанию','servers.duplicate':'Дублировать','servers.setDefault':'Сделать основным','servers.deleteConfirm':'Удалить «{name}»?','form.addTitle':'Добавить сервер','form.editTitle':'Изменить сервер','form.name':'Название сервера','form.namePlaceholder':'Мой сервер OpenCode','form.url':'URL сервера','form.authentication':'Включить вход','form.hide':'Скрыть','form.show':'Показать','form.default':'Сделать сервером по умолчанию','form.saving':'Сохранение…','form.saveChanges':'Сохранить изменения','form.nameRequired':'Введите название сервера.','form.invalidUrl':'Введите корректный URL сервера.','form.saveFailed':'Не удалось сохранить сервер.','settings.connection':'Подключение','settings.timeout':'Тайм-аут проверки (мс)','settings.poll':'Интервал проверки (мс)','settings.reconnect':'Переподключаться автоматически с увеличением интервала','settings.notifications':'Уведомления','settings.enableNotifications':'Включить уведомления','settings.notificationDescription':'Получайте системные уведомления, когда OpenCode Web сообщает об ожидающих одобрениях или завершённых задачах.','settings.language':'Язык','settings.about':'О приложении','connection.loading':'Загрузка OpenCode…','connection.opened':'Открыто в новой вкладке. Закройте её и вернитесь сюда.','connection.openFailed':'Не удалось открыть веб-просмотр.','connection.unreachable':'Сервер недоступен','menu.unknown':'Неизвестно','menu.reconnect':'Переподключиться','menu.cancelReconnect':'Отменить переподключение','menu.switch':'Сменить сервер','menu.editCurrent':'Изменить текущий сервер','menu.disconnect':'Отключиться','menu.enterNewline':'Enter = новая строка','menu.browser':'Открыть в браузере','menu.forward':'Вперёд','demo.title':'Демонстрационная сессия OpenCode','demo.online':'В сети','demo.you':'Вы','demo.hint':'Спросите о репозитории, отладке проблемы или создании патча.','demo.placeholder':'Введите запрос для демо…','demo.send':'Отправить','demo.draft':'Покажи, как это приложение подключается к OpenCode.','demo.welcome':'Я проследил путь подключения в мобильном клиенте. Приложение загружает сохранённый профиль, проверяет доступность сервера и открывает сессию в нативном веб-просмотре.','demo.question':'Можешь проверить мобильный клиент и кратко описать подключение к серверу?','demo.response':'Профили хранятся локально, Pinia управляет состоянием подключения, а успешная проверка открывает полноэкранную сессию.','demo.fallback':'Я проверил этот путь — всё выглядит хорошо. Дальше я бы улучшил удобство и поведение повторных попыток.' }
 
 const catalogs: Record<Locale, MessageCatalog> = {
-  'en-US': en, 'es-ES': es, de, hi, pt, fr, 'zh-Hans': zh, ru,
+  'en-US': en, 'es-ES': es, de, hi, pt, fr, 'zh-Hans': zh, ru, ar,
 }
 
 export function t(key: string, values: Record<string, string | number> = {}): string {
@@ -71,10 +186,23 @@ export function t(key: string, values: Record<string, string | number> = {}): st
   return message.replace(/\{(\w+)\}/g, (_, name: string) => String(values[name] ?? `{${name}}`))
 }
 
+export function isRtl(locale: Locale): boolean {
+  return locale === 'ar'
+}
+
+export function applyDocumentLocale(locale: Locale): void {
+  document.documentElement.lang = locale
+  document.documentElement.dir = isRtl(locale) ? 'rtl' : 'ltr'
+}
+
+export function catalogKeys(locale: Locale): string[] {
+  return Object.keys(catalogs[locale]).sort()
+}
+
 export function setLocale(locale: Locale): void {
   currentLocale.value = locale
   localStorage.setItem(localeStorageKey, locale)
-  document.documentElement.lang = locale
+  applyDocumentLocale(locale)
 }
 
 export function useI18n() {

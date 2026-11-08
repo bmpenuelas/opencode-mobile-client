@@ -2,10 +2,12 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router'
 import App from './App.vue'
-import { i18n } from './i18n'
+import { applyDocumentLocale, i18n, useI18n } from './i18n'
 import './styles/base.css'
 
 document.addEventListener('gesturestart', (e) => e.preventDefault())
+
+applyDocumentLocale(useI18n().locale.value)
 
 const app = createApp(App)
 app.use(createPinia())
