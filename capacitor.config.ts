@@ -3,8 +3,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.logicedge.opencodemobile',
-  appName: 'OpenCode Mobile',
+  appId: 'com.opencode.mobile.ar',
+  appName: 'OpenCode Mobile AR',
   webDir: 'dist',
   server: {
     // Intentionally broad: users connect to self-managed OpenCode servers on

@@ -1,4 +1,4 @@
-package com.logicedge.opencodemobile;
+package com.opencode.mobile.ar;
 
 import com.getcapacitor.BridgeActivity;
 

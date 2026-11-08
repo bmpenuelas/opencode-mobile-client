@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">OpenCode Mobile</string>
-    <string name="title_activity_main">OpenCode Mobile</string>
-    <string name="package_name">com.logicedge.opencodemobile</string>
-    <string name="custom_url_scheme">com.logicedge.opencodemobile</string>
+    <string name="app_name">OpenCode Mobile AR</string>
+    <string name="title_activity_main">OpenCode Mobile AR</string>
+    <string name="package_name">com.opencode.mobile.ar</string>
+    <string name="custom_url_scheme">com.opencode.mobile.ar</string>
 </resources>

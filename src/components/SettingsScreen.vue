@@ -46,7 +46,7 @@
 
       <section class="mt-auto">
         <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{{ t('settings.about') }}</h2>
-        <p class="text-sm mb-2">OpenCode Mobile &lt;Client&gt;</p>
+        <p class="text-sm mb-2">OpenCode Mobile AR</p>
         <p class="text-xs text-muted-foreground leading-relaxed" v-html="t('settings.aboutText')" />
       </section>
       <section>

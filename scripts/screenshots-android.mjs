@@ -8,7 +8,7 @@ import sharp from "sharp";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "..");
 const outDir = join(repoRoot, "docs", "screenshots", "android");
-const APP_ID = "com.logicedge.opencodemobile";
+const APP_ID = "com.opencode.mobile.ar";
 
 const delimiter = platform() === "win32" ? ";" : ":";
 

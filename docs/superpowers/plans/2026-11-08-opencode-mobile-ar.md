@@ -49,6 +49,9 @@ These are the inputs and conditions most likely to break; each has a test or exp
 - Modify: `src/components/SettingsScreen.vue`
 - Modify: `src/services/storage/webDevSecretStorage.ts`
 - Modify: `android/app/build.gradle`
+- Rename: `android/app/src/main/java/com/logicedge/opencodemobile/MainActivity.java` → `android/app/src/main/java/com/opencode/mobile/ar/MainActivity.java`
+- Modify: `android/app/proguard-rules.pro`
+- Modify: `scripts/screenshots-android.mjs`, `scripts/screenshots-ios.mjs`
 - Modify: `android/app/src/main/res/values/strings.xml` and `values-*/strings.xml` (all 9 files)
 - Modify: `android/app/src/main/res/xml/locales_config.xml`
 - Modify: `ios/App/App/Info.plist`
@@ -94,6 +97,9 @@ Apply these exact values:
 | `src/components/SettingsScreen.vue` | about line `OpenCode Mobile <Client>` → `OpenCode Mobile AR` |
 | `src/services/storage/webDevSecretStorage.ts` | console prefix `[OpenCode Mobile Client]` → `[OpenCode Mobile AR]` |
 | `android/app/build.gradle` | `namespace = "com.opencode.mobile.ar"`, `applicationId "com.opencode.mobile.ar"` |
+| `android/.../MainActivity.java` | move to `com/opencode/mobile/ar/` and set `package com.opencode.mobile.ar;` |
+| `android/app/proguard-rules.pro` | keep rule becomes `com.opencode.mobile.ar.MainActivity` |
+| `scripts/screenshots-android.mjs`, `screenshots-ios.mjs` | `APP_ID` = `com.opencode.mobile.ar` |
 | `android/.../values/strings.xml` | `app_name`, `title_activity_main` = `OpenCode Mobile AR`; `package_name`, `custom_url_scheme` = `com.opencode.mobile.ar` |
 | other `values-*/strings.xml` (8 files) | `app_name`, `title_activity_main` = `OpenCode Mobile AR` |
 | `ios/App/App/Info.plist` | `CFBundleDisplayName` = `OpenCode Mobile AR`; replace every `OpenCode Mobile` occurrence (including the App Store review comment) with `OpenCode Mobile AR` |
@@ -115,13 +121,16 @@ Include: upstream URL and MIT licence; the local clone path; `upstream`/`origin`
 
 ```bash
 cd /workspace/opencode-mobile-client
-git grep -n "com.logicedge.opencodemobile"
+git grep -n "com.logicedge.opencodemobile" -- ':!README.md' ':!docs' ':!src/components/StoreBadges.vue' ':!docs/superpowers/plans'
 git grep -n "OpenCode Mobile" -- ':!docs' ':!store' ':!README.md' ':!package-lock.json'
 node scripts/verify-store-readiness.mjs
 npm run lint
 ```
 
-Expected: the first command prints nothing; the second prints only lines containing `OpenCode Mobile AR`; store verification prints `ok -` lines and no `not ok`; lint passes.
+Expected: the first command prints nothing (the excluded files are upstream
+distribution links, documented in `docs/fork.md`); the second prints only lines
+containing `OpenCode Mobile AR`; store verification prints `ok -` lines and no
+`not ok`; lint passes.
 
 - [ ] **Step 7: Commit**
 
