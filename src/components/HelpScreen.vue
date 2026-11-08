@@ -2,7 +2,7 @@
   <div class="min-h-dvh flex flex-col">
     <header class="flex items-center gap-3 px-4 pt-4">
       <Button variant="ghost" size="icon" @click="goBack" :aria-label="t('common.back')">
-        <ArrowLeft class="h-4 w-4" />
+        <ArrowLeft class="h-4 w-4 rtl:rotate-180" />
       </Button>
       <h1 class="text-lg font-semibold">{{ t('common.help') }}</h1>
     </header>

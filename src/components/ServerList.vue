@@ -2,7 +2,7 @@
   <div class="min-h-dvh flex flex-col">
     <header class="flex items-center gap-3 px-4 pt-4 mb-5">
       <Button variant="ghost" size="icon" @click="goBack" :aria-label="t('common.back')">
-        <ArrowLeft class="h-4 w-4" />
+        <ArrowLeft class="h-4 w-4 rtl:rotate-180" />
       </Button>
       <h1 class="text-lg font-semibold flex-1">{{ t('servers.title') }}</h1>
       <Button size="sm" @click="addServer">+ {{ t('common.add') }}</Button>
@@ -22,7 +22,7 @@
         </CardContent>
         <CardFooter>
           <Skeleton class="h-8 w-12" />
-          <Skeleton class="h-8 w-16 ml-1" />
+          <Skeleton class="h-8 w-16 ms-1" />
         </CardFooter>
       </Card>
     </div>
@@ -39,7 +39,7 @@
             <CardTitle class="text-sm">{{ profile.name }}</CardTitle>
             <StatusDot :status="profileStatus(profile)" />
           </div>
-          <CardDescription class="text-xs break-all">{{ sanitizeUrl(profile.baseUrl) }}</CardDescription>
+          <CardDescription class="text-xs break-all" dir="ltr">{{ sanitizeUrl(profile.baseUrl) }}</CardDescription>
           <CardAction>
             <button
               type="button"
@@ -50,7 +50,7 @@
             >
               <span aria-hidden="true" class="absolute -inset-2" />
               <span class="text-xs">{{ t('servers.open') }}</span>
-              <span class="-ml-1 inline-flex h-8 w-8 items-center justify-end"><Play class="fill-current size-3" /></span>
+              <span class="-ms-1 inline-flex h-8 w-8 items-center justify-end"><Play class="fill-current size-3" /></span>
             </button>
           </CardAction>
         </CardHeader>
@@ -63,7 +63,7 @@
             {{ t('servers.default') }}
           </Badge>
           <Badge v-if="profile.authEnabled" variant="outline">{{ t('form.authentication') }}</Badge>
-          <span class="ml-auto text-xs text-muted-foreground self-center">{{ statusLabel(profileStatus(profile)) }}</span>
+          <span class="ms-auto text-xs text-muted-foreground self-center">{{ statusLabel(profileStatus(profile)) }}</span>
         </CardContent>
         <CardFooter class="gap-0.5">
           <Button variant="ghost" size="sm" @click.stop="editServer(profile.id)">{{ t('common.edit') }}</Button>

@@ -19,7 +19,7 @@
           v-for="message in messages"
           :key="message.id"
           class="rounded-2xl border px-4 py-3 shadow-sm"
-          :class="message.role === 'user' ? 'ml-8 bg-muted/50' : 'mr-8 bg-card'"
+          :class="message.role === 'user' ? 'ms-8 bg-muted/50' : 'me-8 bg-card'"
         >
           <div class="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {{ message.role === 'user' ? t('demo.you') : 'OpenCode' }}
