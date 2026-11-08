@@ -205,6 +205,18 @@
 - `setLocale('en-US')` يعيد `lang="en-US"` و`dir="ltr"`.
 - `getWebviewDirection()` تعيد `ltr` افتراضياً وتقرأ القيمة المحفوظة.
 
+### اختبارات آلية إضافية
+
+- `src/tests/localization.test.ts` — نصوص `StatusDot` والمحادثة التجريبية ورسائل
+  الأخطاء تتغير عند تبديل اللغة.
+- `src/tests/uiPreferences.test.ts` — حفظ اتجاه WebView والرجوع إلى `ltr` عند قيمة
+  غير صالحة.
+- `src/tests/webviewDirection.test.ts` — سكربت الاتجاه يبدّل `dir` فقط.
+- `src/tests/webviewToolbar.test.ts` — الشريط المحقون ينعكس عند RTL (تبديل سهمي
+  الرجوع/التقدّم، `dir="rtl"`، قواعد CSS المنطقية، وتسميات معرّبة).
+- `src/tests/rtlShell.test.ts` — المسافات المنطقية، انعكاس أيقونة الرجوع، وجزر
+  LTR في حقول النموذج وبطاقات الخوادم.
+
 ### فحص يدوي
 
 على Android وiOS (أو محاكي):
@@ -232,7 +244,14 @@
 - `docs/superpowers/specs/2026-11-08-opencode-mobile-ar-design.md`
 - `docs/fork.md`
 - `src/services/storage/uiPreferences.ts`
+- `src/services/platform/webviewDirection.ts`
+- `src/services/platform/webviewToolbar.ts`
 - `src/tests/i18n.test.ts`
+- `src/tests/localization.test.ts`
+- `src/tests/uiPreferences.test.ts`
+- `src/tests/webviewDirection.test.ts`
+- `src/tests/webviewToolbar.test.ts`
+- `src/tests/rtlShell.test.ts`
 
 **معدّلة**
 

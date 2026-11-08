@@ -745,3 +745,29 @@ git commit -m "docs: record phase 0+1 verification notes"
 ```
 
 If it lists nothing, skip this commit.
+
+---
+
+## Deviations from the plan (recorded during execution)
+
+1. **Task 1 — extra identity files.** Changing `applicationId` also required moving
+   `android/app/src/main/java/com/logicedge/opencodemobile/MainActivity.java` to
+   `com/opencode/mobile/ar/`, updating the ProGuard keep rule, and updating the
+   `APP_ID` constants in `scripts/screenshots-android.mjs` / `screenshots-ios.mjs`.
+   The upstream store links in `README.md`, `docs/index.html`, and
+   `src/components/StoreBadges.vue` intentionally keep pointing at the published
+   upstream app; they are excluded from the identity grep and documented in
+   `docs/fork.md`.
+2. **Task 3 — key reuse.** The existing `demo.response` key covers the second demo
+   bubble, so `demo.followupAssistant` was not added. `menu.enter` was dropped
+   because the only `Enter` literal in the code is a keyboard `event.key` check.
+   `app.continueHint` was added for the hardcoded store tagline that appeared in
+   both `SettingsScreen.vue` and `HelpScreen.vue`.
+3. **Task 5 — toolbar direction source.** The injected pull menu mirrors when the
+   **WebView direction preference** is `rtl` (per spec 5.5), not when the app UI
+   language is Arabic; the app locale only decides the toolbar *labels*.
+   `buildToolbarScript` and `jsStringLiteral` moved to
+   `src/services/platform/webviewToolbar.ts` so the generated script can be
+   executed and asserted in jsdom (`src/tests/webviewToolbar.test.ts`).
+4. **Task 6 — extra test.** `src/tests/rtlShell.test.ts` asserts the logical
+   spacing classes, the mirrored back arrow, and the LTR islands.
