@@ -58,6 +58,9 @@
 4. `android/app/build.gradle` — `namespace`, `applicationId`.
 5. `ios/App/App.xcodeproj/project.pbxproj` — `PRODUCT_BUNDLE_IDENTIFIER` (موضعان).
 6. `ios/App/App/Info.plist` — `CFBundleDisplayName`.
+7. جميع ملفات `android/app/src/main/res/values-*/strings.xml` — `app_name` و`title_activity_main`.
+8. جميع ملفات `ios/App/App/*.lproj/InfoPlist.strings` — `CFBundleDisplayName` و`CFBundleName`.
+9. `index.html` — عنوان الصفحة.
 
 ### 4.3 تسجيل اللغة على المنصات
 
@@ -138,6 +141,20 @@
 - إعادة بناء الرسائل عند تغيير اللغة (`watch(locale)`) بدل تثبيتها عند التركيب.
 - اكتشاف النية يظل بالإنجليزية، ويُستخدم الرد العربي الافتراضي عند عدم التطابق.
 
+### 5.7 تعريب النصوص الصلبة المتبقية
+
+جرد المكوّنات كشف نصوصاً إنجليزية لا تمر عبر `t()`:
+
+| الموضع | النص | المعالجة |
+|---|---|---|
+| `StatusDot.vue` | خريطة `statusLabel` | استخدام مفاتيح `status.*` الموجودة |
+| `connectionStore.ts` | `Server profile not found` | `connection.profileNotFound` |
+| `connectionStore.ts` | `The username or password is incorrect.` | `connection.wrongCredentialsMessage` |
+| `connectionStore.ts` | `Server at {url} is not reachable.` | `connection.serverUnreachable` مع `{url}` |
+| `ServerProfileForm.vue` | `placeholder="username"` و`"password"` | `form.usernamePlaceholder` و`form.passwordPlaceholder` |
+| `StoreBadges.vue` | `aria-label` الإنجليزية | مفاتيح `store.*` |
+| `ConnectionShell.vue` | `Options ⋮`, `Enter`, `Scroll prompt controls`, `OpenCode notification` | مفاتيح `menu.*` و`connection.notificationFallback` |
+
 ## 6. تدفّق البيانات
 
 ```
@@ -179,7 +196,8 @@
 
 ### اختبارات آلية — `src/tests/i18n.test.ts`
 
-- تطابق مفاتيح كل كتالوج مع `en` (لا ناقص ولا زائد).
+- `ar` يطابق مفاتيح `en` تماماً (لا ناقص ولا زائد).
+- بقية اللغات مجموعات فرعية مسموحة من `en` (fallback إلى الإنجليزية) ولا تحتوي مفاتيح غير معروفة.
 - `isRtl('ar') === true` وبقية اللغات `false`.
 - اكتشاف `ar-EG` من `navigator.language`.
 - احترام اللغة المحفوظة في `localStorage`.
@@ -224,18 +242,27 @@
 - `src/main.ts`
 - `src/styles/base.css`
 - `src/components/SettingsScreen.vue`
+- `src/components/LandingScreen.vue`
 - `src/components/ConnectionShell.vue`
 - `src/components/ServerList.vue`
 - `src/components/DemoSessionMock.vue`
 - `src/components/HelpScreen.vue`
+- `src/components/StatusDot.vue`
+- `src/components/StoreBadges.vue`
+- `src/components/ServerProfileForm.vue`
+- `src/stores/connectionStore.ts`
+- `src/services/storage/webDevSecretStorage.ts`
+- `index.html`
 - `src/components/ui/alert/AlertAction.vue`
 - `src/components/ui/dialog/DialogContent.vue`
 - `src/components/ui/dialog/DialogScrollContent.vue`
 - `src/components/ui/sheet/SheetContent.vue`
 - `android/app/src/main/res/values/strings.xml`
+- `android/app/src/main/res/values-*/strings.xml`
 - `android/app/src/main/res/xml/locales_config.xml`
 - `android/app/build.gradle`
 - `ios/App/App/Info.plist`
+- `ios/App/App/*.lproj/InfoPlist.strings`
 - `ios/App/App.xcodeproj/project.pbxproj`
 
 ## 11. أسئلة مؤجلة
