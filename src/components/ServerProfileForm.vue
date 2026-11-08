@@ -17,7 +17,7 @@
           </div>
           <div class="flex flex-col gap-1.5">
             <Label for="baseUrl" class="text-center justify-center">{{ t('form.url') }}</Label>
-            <Input id="baseUrl" v-model="form.baseUrl" type="url" placeholder="http://192.168.1.100:4096" inputmode="url" required />
+            <Input id="baseUrl" v-model="form.baseUrl" type="url" placeholder="http://192.168.1.100:4096" inputmode="url" dir="ltr" required />
             <p v-if="urlWarning" class="text-xs text-muted-foreground">{{ urlWarning }}</p>
             <p v-if="urlError" class="text-xs text-destructive">{{ urlError }}</p>
           </div>
@@ -29,11 +29,11 @@
           </div>
           <template v-if="form.authEnabled">
             <div class="flex flex-col gap-1.5">
-              <Input id="username" v-model="form.username" placeholder="username" />
+              <Input id="username" v-model="form.username" dir="ltr" :placeholder="t('form.usernamePlaceholder')" />
             </div>
             <div class="flex flex-col gap-1.5">
               <div class="flex gap-1 items-center">
-                <Input id="password" :type="showPassword ? 'text' : 'password'" v-model="form.password" placeholder="password" class="flex-1" />
+                <Input id="password" :type="showPassword ? 'text' : 'password'" v-model="form.password" dir="ltr" :placeholder="t('form.passwordPlaceholder')" class="flex-1" />
                 <Button v-if="form.password" type="button" variant="ghost" size="icon" @click="form.password = ''">&times;</Button>
                 <Button type="button" variant="outline" size="xs" @click="showPassword = !showPassword">{{ showPassword ? t('form.hide') : t('form.show') }}</Button>
               </div>

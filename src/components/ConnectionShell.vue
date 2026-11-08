@@ -175,7 +175,7 @@ function buildToolbarScript(status: string, displayUrl: string): string {
     document.head.appendChild(s);
     var tab=document.createElement('div');tab.id='oc-tab';
     var tabSpinner=document.createElement('span');tabSpinner.className='oc-tab-spinner';tabSpinner.setAttribute('aria-hidden','true');
-    var tabLabel=document.createElement('span');tabLabel.id='oc-tab-label';tabLabel.textContent='Options \\u22EE';
+    var tabLabel=document.createElement('span');tabLabel.id='oc-tab-label';tabLabel.textContent=${jsStringLiteral(t('menu.options'))}+' \\u22EE';
     tab.appendChild(tabSpinner);tab.appendChild(tabLabel);
     document.body.appendChild(tab);
     var panel=document.createElement('div');panel.id='oc-panel';
@@ -344,7 +344,7 @@ function buildMobileComposerFixScript(): string {
       button=document.createElement('button');
       button.type='button';
       button.setAttribute('data-oc-mobile-composer-scroll',side);
-      button.setAttribute('aria-label','Scroll prompt controls '+side);
+      button.setAttribute('aria-label',${jsStringLiteral(t('menu.scrollControls'))}+' '+side);
       var glyph=document.createElement('span');
       glyph.setAttribute('aria-hidden','true');
       glyph.textContent=direction<0?'\u2039':'\u203a';
@@ -446,7 +446,7 @@ function getNotificationPromptPreview(detail: unknown): string {
   const record = detail && typeof detail === 'object' ? detail as Record<string, unknown> : {}
   const title = typeof record.title === 'string' ? record.title.trim() : ''
   const body = typeof record.body === 'string' ? record.body.trim() : ''
-  return ellipsize([title, body].filter(Boolean).join('\n') || 'OpenCode notification')
+  return ellipsize([title, body].filter(Boolean).join('\n') || t('connection.notificationFallback'))
 }
 
 function buildNotificationApprovalPromptScript(preview: string): string {

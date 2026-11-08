@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import type { ConnectionState, ServerProfile } from '@/types'
 import { checkServerHealth } from '@/services/opencode/health'
 import { useServerStore } from './serverStore'
+import { t } from '@/i18n'
 
 const DEFAULT_TIMEOUT = 3500
 const DEFAULT_POLL_INTERVAL = 10000
@@ -56,7 +57,7 @@ export const useConnectionStore = defineStore('connection', () => {
     const profile = serverStore.profiles.find((p: ServerProfile) => p.id === serverId)
     if (!profile) {
       state.value = 'unreachable'
-      lastError.value = 'Server profile not found'
+      lastError.value = t('connection.profileNotFound')
       return false
     }
 
@@ -92,12 +93,12 @@ export const useConnectionStore = defineStore('connection', () => {
 
     if (result.status === 'wrong_credentials') {
       state.value = 'wrong_credentials'
-      lastError.value = 'The username or password is incorrect.'
+      lastError.value = t('connection.wrongCredentialsMessage')
       return false
     }
 
     state.value = 'unreachable'
-    lastError.value = `Server at ${profile.baseUrl} is not reachable.`
+    lastError.value = t('connection.serverUnreachable', { url: profile.baseUrl })
     return false
   }
 

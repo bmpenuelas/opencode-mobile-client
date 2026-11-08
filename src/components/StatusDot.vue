@@ -4,18 +4,30 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from '@/i18n'
 
 const props = defineProps<{ status: string }>()
 
+const { t } = useI18n()
+
+const statusKeyMap: Record<string, string> = {
+  online: 'status.ready',
+  offline: 'status.offline',
+  connected: 'status.connected',
+  checking: 'status.checking',
+  reconnecting: 'status.reconnecting',
+  idle: 'status.ready',
+  auth_required: 'status.authRequired',
+  wrong_credentials: 'status.wrongCredentials',
+  unreachable: 'status.unreachable',
+  frame_blocked: 'status.blocked',
+  disconnected: 'status.disconnected',
+  unknown: 'status.unknown',
+}
+
 const statusLabel = computed(() => {
-  const map: Record<string, string> = {
-    online: 'Ready to connect', offline: 'Offline', connected: 'Connected',
-    checking: 'Checking...', reconnecting: 'Reconnecting...',
-    idle: 'Ready to connect', auth_required: 'Authentication required',
-    wrong_credentials: 'Wrong credentials', unreachable: 'Unreachable',
-    frame_blocked: 'Frame blocked', disconnected: 'Disconnected', unknown: 'Unknown',
-  }
-  return map[props.status] ?? props.status
+  const key = statusKeyMap[props.status]
+  return key ? t(key) : props.status
 })
 
 const dotClass = computed(() => {

@@ -12,7 +12,7 @@
         <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{{ t('help.about') }}</h2>
         <p class="text-sm leading-relaxed">{{ t('help.aboutText') }}</p>
         <div class="mt-4 flex flex-col items-center gap-3">
-          <p class="text-sm text-center leading-relaxed">🔃 Seamlessly continue sessions started on your computer from your phone, or vice versa.</p>
+          <p class="text-sm text-center leading-relaxed">{{ t('app.continueHint') }}</p>
           <StoreBadges />
         </div>
       </section>

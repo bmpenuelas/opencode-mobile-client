@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="mt-5 flex flex-col items-center gap-3">
-          <p class="text-xs text-muted-foreground text-center leading-relaxed">🔃 Seamlessly continue sessions started on your computer from your phone, or vice versa.</p>
+          <p class="text-xs text-muted-foreground text-center leading-relaxed">{{ t('app.continueHint') }}</p>
           <StoreBadges />
         </div>
       </section>

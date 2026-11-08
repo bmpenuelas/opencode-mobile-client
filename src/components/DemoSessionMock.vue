@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from '@/i18n'
 
 interface DemoMessage {
@@ -68,36 +68,50 @@ interface DemoMessage {
 defineProps<{
   profileName: string
 }>()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const draft = ref(t('demo.draft'))
-const messages = ref<DemoMessage[]>([
-  {
-    id: 'assistant-1',
-    role: 'assistant',
-    content: t('demo.welcome'),
-  },
-  {
-    id: 'user-1',
-    role: 'user',
-    content: t('demo.question'),
-  },
-  {
-    id: 'assistant-2',
-    role: 'assistant',
-    content: 'Sure — profiles are stored locally, connection state is managed in Pinia, and successful checks transition into the full-screen session view. There is also reconnect handling and periodic health polling once the session is up.',
-  },
-  {
-    id: 'user-2',
-    role: 'user',
-    content: 'Could you add a lightweight demo mode for sales walkthroughs?',
-  },
-  {
-    id: 'assistant-3',
-    role: 'assistant',
-    content: 'Yes. I would special-case a known demo profile, keep the status online, and swap the webview for a local chat mock so the experience stays smooth during a walkthrough.',
-  },
-])
+let defaultDraft = t('demo.draft')
+const messages = ref<DemoMessage[]>([])
+
+function buildMessages(): void {
+  messages.value = [
+    {
+      id: 'assistant-1',
+      role: 'assistant',
+      content: t('demo.welcome'),
+    },
+    {
+      id: 'user-1',
+      role: 'user',
+      content: t('demo.question'),
+    },
+    {
+      id: 'assistant-2',
+      role: 'assistant',
+      content: t('demo.response'),
+    },
+    {
+      id: 'user-2',
+      role: 'user',
+      content: t('demo.followupUser'),
+    },
+    {
+      id: 'assistant-3',
+      role: 'assistant',
+      content: t('demo.demoAnswer'),
+    },
+  ]
+}
+
+buildMessages()
+
+watch(locale, () => {
+  buildMessages()
+  // Keep a prompt the user typed, but refresh the untouched default prompt.
+  if (!draft.value.trim() || draft.value === defaultDraft) draft.value = t('demo.draft')
+  defaultDraft = t('demo.draft')
+})
 
 function sendDemoMessage(): void {
   const content = draft.value.trim()
@@ -111,18 +125,18 @@ function sendDemoMessage(): void {
   })
 
   const lower = content.toLowerCase()
-  let response = 'I checked that path and the flow looks good. Next I would tighten the UX details and verify the connected state, retry behavior, and session shell interactions.'
+  let response = t('demo.fallback')
 
   if (lower.includes('connect') || lower.includes('connection') || lower.includes('server')) {
-    response = 'The connection path looks healthy. I would keep the preflight health check, mark the profile online, and then hand off into the session shell once authentication succeeds.'
+    response = t('demo.replyConnect')
   } else if (lower.includes('bug') || lower.includes('fix') || lower.includes('issue')) {
-    response = 'I found the likely failure point. I would patch it in the store/component boundary first, then run a build and validate the behavior with a quick end-to-end check.'
+    response = t('demo.replyFix')
   } else if (lower.includes('ui') || lower.includes('design') || lower.includes('mock')) {
-    response = 'The UI direction makes sense. I would keep the layout simple, preserve the current visual language, and make the session feel consistent with the live OpenCode view.'
+    response = t('demo.replyUi')
   } else if (lower.includes('test') || lower.includes('build') || lower.includes('verify')) {
-    response = 'I would validate this with a production build plus a quick manual pass through the main connection scenarios: success, auth failure, unreachable server, and reconnect.'
+    response = t('demo.replyVerify')
   } else if (lower.includes('demo')) {
-    response = 'For the demo flow, I would keep the status pinned online and preload a believable conversation so the session immediately feels active when someone taps Connect.'
+    response = t('demo.replyDemo')
   }
 
   messages.value.push({
