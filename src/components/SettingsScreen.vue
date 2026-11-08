@@ -55,6 +55,14 @@
           <option v-for="option in supportedLocales" :key="option.code" :value="option.code">{{ option.label }}</option>
         </select>
       </section>
+      <section class="mt-4">
+        <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{{ t('settings.webviewDirection') }}</h2>
+        <select v-model="webviewDirection" class="w-full rounded-md border bg-background px-3 py-2 text-sm">
+          <option value="ltr">{{ t('settings.webviewDirectionLtr') }}</option>
+          <option value="rtl">{{ t('settings.webviewDirectionRtl') }}</option>
+        </select>
+        <p class="text-xs text-muted-foreground mt-1 leading-relaxed">{{ t('settings.webviewDirectionHint') }}</p>
+      </section>
     </div>
   </div>
 </template>
@@ -75,6 +83,11 @@ import {
   loadNativeNotificationSettings,
 } from '@/services/platform/nativeNotifications'
 import { useI18n, type Locale } from '@/i18n'
+import {
+  getWebviewDirection,
+  setWebviewDirection,
+  type WebviewDirection,
+} from '@/services/storage/uiPreferences'
 
 const router = useRouter()
 const connectionStore = useConnectionStore()
@@ -84,11 +97,13 @@ const timeoutMs = ref(connectionStore.healthCheckTimeout)
 const pollMs = ref(connectionStore.healthPollInterval)
 const exponentialReconnect = ref(connectionStore.exponentialReconnectEnabled)
 const notificationsEnabled = ref(false)
+const webviewDirection = ref<WebviewDirection>(getWebviewDirection())
 
 let notificationsLoaded = false
 let syncingNotificationsSwitch = false
 
 watch(locale, (value) => setLocale(value as Locale))
+watch(webviewDirection, (value) => setWebviewDirection(value))
 
 watch(timeoutMs, (val) => { if (val >= 1000 && val <= 30000) connectionStore.setHealthCheckTimeout(val) })
 watch(pollMs, (val) => { if (val >= 2000 && val <= 60000) connectionStore.setHealthPollInterval(val) })
