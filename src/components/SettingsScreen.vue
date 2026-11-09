@@ -2,7 +2,7 @@
   <div class="min-h-dvh flex flex-col">
     <header class="flex items-center gap-3 px-4 pt-4">
       <Button variant="ghost" size="icon" @click="goBack" :aria-label="t('common.back')">
-        <ArrowLeft class="h-4 w-4" />
+        <ArrowLeft class="h-4 w-4 rtl:rotate-180" />
       </Button>
       <h1 class="text-lg font-semibold">{{ t('common.settings') }}</h1>
     </header>
@@ -39,14 +39,14 @@
           </div>
         </div>
         <div class="mt-5 flex flex-col items-center gap-3">
-          <p class="text-xs text-muted-foreground text-center leading-relaxed">🔃 Seamlessly continue sessions started on your computer from your phone, or vice versa.</p>
+          <p class="text-xs text-muted-foreground text-center leading-relaxed">{{ t('app.continueHint') }}</p>
           <StoreBadges />
         </div>
       </section>
 
       <section class="mt-auto">
         <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{{ t('settings.about') }}</h2>
-        <p class="text-sm mb-2">OpenCode Mobile &lt;Client&gt;</p>
+        <p class="text-sm mb-2">OpenCode Mobile AR</p>
         <p class="text-xs text-muted-foreground leading-relaxed" v-html="t('settings.aboutText')" />
       </section>
       <section>
@@ -54,6 +54,14 @@
         <select v-model="locale" class="w-full rounded-md border bg-background px-3 py-2 text-sm">
           <option v-for="option in supportedLocales" :key="option.code" :value="option.code">{{ option.label }}</option>
         </select>
+      </section>
+      <section class="mt-4">
+        <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{{ t('settings.webviewDirection') }}</h2>
+        <select v-model="webviewDirection" class="w-full rounded-md border bg-background px-3 py-2 text-sm">
+          <option value="ltr">{{ t('settings.webviewDirectionLtr') }}</option>
+          <option value="rtl">{{ t('settings.webviewDirectionRtl') }}</option>
+        </select>
+        <p class="text-xs text-muted-foreground mt-1 leading-relaxed">{{ t('settings.webviewDirectionHint') }}</p>
       </section>
     </div>
   </div>
@@ -75,6 +83,11 @@ import {
   loadNativeNotificationSettings,
 } from '@/services/platform/nativeNotifications'
 import { useI18n, type Locale } from '@/i18n'
+import {
+  getWebviewDirection,
+  setWebviewDirection,
+  type WebviewDirection,
+} from '@/services/storage/uiPreferences'
 
 const router = useRouter()
 const connectionStore = useConnectionStore()
@@ -84,11 +97,13 @@ const timeoutMs = ref(connectionStore.healthCheckTimeout)
 const pollMs = ref(connectionStore.healthPollInterval)
 const exponentialReconnect = ref(connectionStore.exponentialReconnectEnabled)
 const notificationsEnabled = ref(false)
+const webviewDirection = ref<WebviewDirection>(getWebviewDirection())
 
 let notificationsLoaded = false
 let syncingNotificationsSwitch = false
 
 watch(locale, (value) => setLocale(value as Locale))
+watch(webviewDirection, (value) => setWebviewDirection(value))
 
 watch(timeoutMs, (val) => { if (val >= 1000 && val <= 30000) connectionStore.setHealthCheckTimeout(val) })
 watch(pollMs, (val) => { if (val >= 2000 && val <= 60000) connectionStore.setHealthPollInterval(val) })

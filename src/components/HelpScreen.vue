@@ -2,7 +2,7 @@
   <div class="min-h-dvh flex flex-col">
     <header class="flex items-center gap-3 px-4 pt-4">
       <Button variant="ghost" size="icon" @click="goBack" :aria-label="t('common.back')">
-        <ArrowLeft class="h-4 w-4" />
+        <ArrowLeft class="h-4 w-4 rtl:rotate-180" />
       </Button>
       <h1 class="text-lg font-semibold">{{ t('common.help') }}</h1>
     </header>
@@ -12,7 +12,7 @@
         <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">{{ t('help.about') }}</h2>
         <p class="text-sm leading-relaxed">{{ t('help.aboutText') }}</p>
         <div class="mt-4 flex flex-col items-center gap-3">
-          <p class="text-sm text-center leading-relaxed">🔃 Seamlessly continue sessions started on your computer from your phone, or vice versa.</p>
+          <p class="text-sm text-center leading-relaxed">{{ t('app.continueHint') }}</p>
           <StoreBadges />
         </div>
       </section>

@@ -23,7 +23,7 @@
             <source srcset="/opencode-mobile-client-logo-dark.svg" media="(prefers-color-scheme: dark)">
             <img src="/opencode-mobile-client-logo-light.svg" alt="OpenCode" class="h-17 mx-auto mb-3" />
           </picture>
-          <h1 class="text-2xl font-bold mb-1">OpenCode Mobile &lt;Client&gt;</h1>
+          <h1 class="text-2xl font-bold mb-1">OpenCode Mobile AR</h1>
           <p class="text-sm text-muted-foreground">{{ t('landing.tagline') }}</p>
         </div>
 
@@ -32,7 +32,7 @@
             <StatusDot :status="statusForDot" />
             <div class="flex-1 min-w-0">
               <CardTitle class="text-sm">{{ defaultProfile.name }}</CardTitle>
-              <CardDescription class="text-xs break-all">{{ sanitizeUrl(defaultProfile.baseUrl) }}</CardDescription>
+              <CardDescription class="text-xs break-all" dir="ltr">{{ sanitizeUrl(defaultProfile.baseUrl) }}</CardDescription>
             </div>
             <Button variant="ghost" size="sm" @click.stop="connectDefault" :title="t('landing.connect')"><Play class="fill-current size-3" /></Button>
           </CardContent>

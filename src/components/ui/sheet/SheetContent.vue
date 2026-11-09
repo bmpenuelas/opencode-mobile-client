@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from '@/components/ui/button'
 import SheetOverlay from "./SheetOverlay.vue"
+import { useI18n } from '@/i18n'
 
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes["class"]
@@ -33,6 +34,7 @@ const emits = defineEmits<DialogContentEmits>()
 const delegatedProps = reactiveOmit(props, "class", "side", "showCloseButton")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const { t } = useI18n()
 </script>
 
 <template>
@@ -51,9 +53,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         data-slot="sheet-close"
         as-child
       >
-        <Button variant="ghost" class="absolute top-3 right-3" size="icon-sm">
+        <Button variant="ghost" class="absolute top-3 end-3" size="icon-sm">
           <XIcon />
-          <span class="sr-only">Close</span>
+          <span class="sr-only">{{ t('common.close') }}</span>
         </Button>
       </DialogClose>
     </DialogContent>

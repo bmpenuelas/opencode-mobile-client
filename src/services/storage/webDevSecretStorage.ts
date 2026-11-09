@@ -4,7 +4,7 @@ const PREFIX = 'opencode_dev_pw_'
 
 function warnDev(): void {
   console.warn(
-    '[OpenCode Mobile Client] Using WEB DEV fallback storage for secrets. ' +
+    '[OpenCode Mobile AR] Using WEB DEV fallback storage for secrets. ' +
     'Passwords are stored in localStorage (insecure). ' +
     'This is only suitable for development. ' +
     'On native builds, @aparajita/capacitor-secure-storage is used.'

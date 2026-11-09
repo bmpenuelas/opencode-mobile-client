@@ -6,7 +6,7 @@
           <StatusDot :status="connectionStore.state" />
           <SheetTitle class="text-base">{{ activeProfile?.name ?? t('menu.unknown') }}</SheetTitle>
         </div>
-        <SheetDescription class="text-xs break-all">{{ sanitizedUrl }}</SheetDescription>
+        <SheetDescription class="text-xs break-all" dir="ltr">{{ sanitizedUrl }}</SheetDescription>
         <div class="text-xs text-muted-foreground mt-1">{{ statusText }}</div>
       </SheetHeader>
 

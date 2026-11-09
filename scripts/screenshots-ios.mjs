@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "..");
 const outDir = join(repoRoot, "docs", "screenshots", "ios");
-const APP_ID = "com.logicedge.opencodemobile";
+const APP_ID = "com.opencode.mobile.ar";
 
 function run(description, cmd, args = []) {
   console.log(`\n[${description}]`);

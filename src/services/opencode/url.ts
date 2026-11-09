@@ -9,42 +9,43 @@ export function normalizeUrl(url: string): string {
 
 export interface ValidationResult {
   valid: boolean
-  error?: string
+  /** i18n key of the message to show (error when invalid, warning when valid). */
+  messageKey?: string
 }
 
 export function validateUrl(url: string): ValidationResult {
   if (!url || !url.trim()) {
-    return { valid: false, error: 'URL is required' }
+    return { valid: false, messageKey: 'form.urlRequired' }
   }
 
   const trimmed = url.trim()
 
   if (!/^https?:\/\//i.test(trimmed)) {
-    return { valid: false, error: 'URL must start with http:// or https://' }
+    return { valid: false, messageKey: 'form.urlSchemeRequired' }
   }
 
   try {
     const parsed = new URL(trimmed)
 
     if (!parsed.hostname) {
-      return { valid: false, error: 'URL must include a hostname' }
+      return { valid: false, messageKey: 'form.urlHostnameRequired' }
     }
 
     if (/xxx/i.test(parsed.hostname)) {
-      return { valid: false, error: 'Replace the placeholder URL with your server\'s actual address' }
+      return { valid: false, messageKey: 'form.urlPlaceholder' }
     }
 
     if (parsed.username || parsed.password) {
-      return { valid: false, error: 'Embedded credentials in URL are not allowed. Use the separate auth fields instead.' }
+      return { valid: false, messageKey: 'form.urlEmbeddedCredentials' }
     }
 
     if (parsed.protocol === 'http:' && !isLocalOrPrivateHost(parsed.hostname)) {
-      return { valid: true, error: 'Using HTTP over the internet is not secure. Use HTTPS or a VPN for remote connections.' }
+      return { valid: true, messageKey: 'form.urlInsecureHttp' }
     }
 
     return { valid: true }
   } catch {
-    return { valid: false, error: 'Invalid URL format' }
+    return { valid: false, messageKey: 'form.urlInvalid' }
   }
 }
 

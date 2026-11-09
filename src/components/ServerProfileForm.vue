@@ -2,7 +2,7 @@
   <div class="min-h-dvh flex flex-col">
     <header class="flex items-center gap-3 px-4 pt-4">
       <Button variant="ghost" size="icon" @click="goBack" :aria-label="t('common.back')">
-        <ArrowLeft class="h-4 w-4" />
+        <ArrowLeft class="h-4 w-4 rtl:rotate-180" />
       </Button>
       <h1 class="text-lg font-semibold">{{ isEdit ? t('form.editTitle') : t('form.addTitle') }}</h1>
     </header>
@@ -17,7 +17,7 @@
           </div>
           <div class="flex flex-col gap-1.5">
             <Label for="baseUrl" class="text-center justify-center">{{ t('form.url') }}</Label>
-            <Input id="baseUrl" v-model="form.baseUrl" type="url" placeholder="http://192.168.1.100:4096" inputmode="url" required />
+            <Input id="baseUrl" v-model="form.baseUrl" type="url" placeholder="http://192.168.1.100:4096" inputmode="url" dir="ltr" required />
             <p v-if="urlWarning" class="text-xs text-muted-foreground">{{ urlWarning }}</p>
             <p v-if="urlError" class="text-xs text-destructive">{{ urlError }}</p>
           </div>
@@ -29,11 +29,11 @@
           </div>
           <template v-if="form.authEnabled">
             <div class="flex flex-col gap-1.5">
-              <Input id="username" v-model="form.username" placeholder="username" />
+              <Input id="username" v-model="form.username" dir="ltr" :placeholder="t('form.usernamePlaceholder')" />
             </div>
             <div class="flex flex-col gap-1.5">
               <div class="flex gap-1 items-center">
-                <Input id="password" :type="showPassword ? 'text' : 'password'" v-model="form.password" placeholder="password" class="flex-1" />
+                <Input id="password" :type="showPassword ? 'text' : 'password'" v-model="form.password" dir="ltr" :placeholder="t('form.passwordPlaceholder')" class="flex-1" />
                 <Button v-if="form.password" type="button" variant="ghost" size="icon" @click="form.password = ''">&times;</Button>
                 <Button type="button" variant="outline" size="xs" @click="showPassword = !showPassword">{{ showPassword ? t('form.hide') : t('form.show') }}</Button>
               </div>
@@ -109,16 +109,16 @@ watch(() => form.value.baseUrl, () => {
   urlError.value = ''; urlWarning.value = ''
   if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
-  if (!result.valid) urlError.value = result.error ?? t('form.invalidUrl')
-  else if (result.error) urlWarning.value = result.error
+  if (!result.valid) urlError.value = result.messageKey ? t(result.messageKey) : t('form.invalidUrl')
+  else if (result.messageKey) urlWarning.value = t(result.messageKey)
 })
 
 watch(() => [form.value.authEnabled, form.value.username, form.value.password], () => {
   urlError.value = ''; urlWarning.value = ''
   if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
-  if (!result.valid) urlError.value = result.error ?? t('form.invalidUrl')
-  else if (result.error) urlWarning.value = result.error
+  if (!result.valid) urlError.value = result.messageKey ? t(result.messageKey) : t('form.invalidUrl')
+  else if (result.messageKey) urlWarning.value = t(result.messageKey)
 })
 
 onMounted(async () => {
@@ -148,7 +148,7 @@ async function handleSubmit(): Promise<void> {
   const demoCredentials = isDemoCredentialsInForm()
   if (!demoCredentials) {
     const urlResult = validateUrl(form.value.baseUrl)
-    if (!urlResult.valid) { formError.value = urlResult.error ?? t('form.invalidUrl'); return }
+    if (!urlResult.valid) { formError.value = urlResult.messageKey ? t(urlResult.messageKey) : t('form.invalidUrl'); return }
   }
 
   saving.value = true
