@@ -66,5 +66,8 @@ describe('connection errors', () => {
     await store.connect('missing-id')
     expect(store.lastError).toBe(i18n.t('connection.profileNotFound'))
     expect(store.lastError).toMatch(arabic)
+
+    i18n.setLocale('en-US')
+    expect(store.lastError).toBe('Server profile not found.')
   })
 })

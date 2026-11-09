@@ -42,7 +42,10 @@ import {
 } from '@/services/platform/nativeNotifications'
 import { useI18n } from '@/i18n'
 import { getWebviewDirection } from '@/services/storage/uiPreferences'
-import { buildDirectionScript } from '@/services/platform/webviewDirection'
+import {
+  buildPreShowScript,
+  buildWebviewDirectionScript,
+} from '@/services/platform/webviewDirection'
 import { buildToolbarScript, jsStringLiteral } from '@/services/platform/webviewToolbar'
 
 const route = useRoute()
@@ -219,7 +222,7 @@ function buildMobileComposerFixScript(): string {
       button=document.createElement('button');
       button.type='button';
       button.setAttribute('data-oc-mobile-composer-scroll',side);
-      button.setAttribute('aria-label',${jsStringLiteral(t('menu.scrollControls'))}+' '+side);
+      button.setAttribute('aria-label',${jsStringLiteral(t('menu.scrollControls'))}+' '+(side==='left'?${jsStringLiteral(t('menu.scrollLeft'))}:${jsStringLiteral(t('menu.scrollRight'))}));
       var glyph=document.createElement('span');
       glyph.setAttribute('aria-hidden','true');
       glyph.textContent=direction<0?'\u2039':'\u203a';
@@ -332,7 +335,7 @@ function buildNotificationApprovalPromptScript(preview: string): string {
     if(old)old.remove();
     var style=document.createElement('style');
     style.id='oc-notification-permission-style';
-    style.textContent='#oc-notification-permission-modal{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.54);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#f5f5f7}#oc-notification-permission-box{width:min(330px,100%);background:#1c1c1e;border:1px solid rgba(255,255,255,.14);border-radius:14px;box-shadow:0 16px 44px rgba(0,0,0,.5);overflow:hidden}#oc-notification-permission-content{padding:18px 18px 14px;display:flex;flex-direction:column;gap:12px}#oc-notification-permission-title{font-size:17px;font-weight:700;line-height:1.25;text-align:center}#oc-notification-permission-message{font-size:13px;line-height:1.38;color:rgba(245,245,247,.78);text-align:center}#oc-notification-permission-preview{font-size:13px;line-height:1.35;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:88px;overflow:hidden}#oc-notification-permission-foot{font-size:12px;line-height:1.3;color:rgba(245,245,247,.58);text-align:center}#oc-notification-permission-actions{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.12)}#oc-notification-permission-actions button{appearance:none;border:0;background:transparent;color:#0a84ff;font-size:16px;padding:13px 8px;font-weight:600}#oc-notification-permission-actions button:first-child{border-right:1px solid rgba(255,255,255,.12);font-weight:500;color:rgba(245,245,247,.8)}';
+    style.textContent='#oc-notification-permission-modal{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.54);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#f5f5f7}#oc-notification-permission-box{width:min(330px,100%);background:#1c1c1e;border:1px solid rgba(255,255,255,.14);border-radius:14px;box-shadow:0 16px 44px rgba(0,0,0,.5);overflow:hidden}#oc-notification-permission-content{padding:18px 18px 14px;display:flex;flex-direction:column;gap:12px}#oc-notification-permission-title{font-size:17px;font-weight:700;line-height:1.25;text-align:center}#oc-notification-permission-message{font-size:13px;line-height:1.38;color:rgba(245,245,247,.78);text-align:center}#oc-notification-permission-preview{font-size:13px;line-height:1.35;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:88px;overflow:hidden}#oc-notification-permission-foot{font-size:12px;line-height:1.3;color:rgba(245,245,247,.58);text-align:center}#oc-notification-permission-actions{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.12)}#oc-notification-permission-actions button{appearance:none;border:0;background:transparent;color:#0a84ff;font-size:16px;padding:13px 8px;font-weight:600}#oc-notification-permission-actions button:first-child{border-inline-end:1px solid rgba(255,255,255,.12);font-weight:500;color:rgba(245,245,247,.8)}';
     document.head.appendChild(style);
     var modal=document.createElement('div');
     modal.id='oc-notification-permission-modal';
@@ -462,7 +465,7 @@ async function openInAppBrowser(): Promise<void> {
   pageLoadedHandle = await InAppBrowser.addListener('browserPageLoaded', async () => {
     const displayUrl = profile.value!.baseUrl.replace(/^https?:\/\//, '')
     await InAppBrowser.executeScript({ code: buildToolbarScript(connectionStore.state, displayUrl, getWebviewDirection() === 'rtl') })
-    await InAppBrowser.executeScript({ code: buildDirectionScript(getWebviewDirection()) })
+    await InAppBrowser.executeScript({ code: buildWebviewDirectionScript() })
     await InAppBrowser.executeScript({ code: buildMobileComposerFixScript() })
     await InAppBrowser.executeScript({
       code: `(function(){
@@ -525,7 +528,7 @@ async function openInAppBrowser(): Promise<void> {
       activeNativeNavigationForWebview: true,
       isPresentAfterPageLoad: true,
       preShowScriptInjectionTime: 'documentStart',
-      preShowScript: buildNotificationBridgeScript() + '\n' + buildDirectionScript(getWebviewDirection()),
+      preShowScript: buildPreShowScript(buildNotificationBridgeScript()),
       ...(auth && !isIOS ? {
         credentials: {
           username: profile.value!.username,

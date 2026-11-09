@@ -109,16 +109,16 @@ watch(() => form.value.baseUrl, () => {
   urlError.value = ''; urlWarning.value = ''
   if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
-  if (!result.valid) urlError.value = result.error ?? t('form.invalidUrl')
-  else if (result.error) urlWarning.value = result.error
+  if (!result.valid) urlError.value = result.messageKey ? t(result.messageKey) : t('form.invalidUrl')
+  else if (result.messageKey) urlWarning.value = t(result.messageKey)
 })
 
 watch(() => [form.value.authEnabled, form.value.username, form.value.password], () => {
   urlError.value = ''; urlWarning.value = ''
   if (isDemoCredentialsInForm()) return
   const result = validateUrl(form.value.baseUrl)
-  if (!result.valid) urlError.value = result.error ?? t('form.invalidUrl')
-  else if (result.error) urlWarning.value = result.error
+  if (!result.valid) urlError.value = result.messageKey ? t(result.messageKey) : t('form.invalidUrl')
+  else if (result.messageKey) urlWarning.value = t(result.messageKey)
 })
 
 onMounted(async () => {
@@ -148,7 +148,7 @@ async function handleSubmit(): Promise<void> {
   const demoCredentials = isDemoCredentialsInForm()
   if (!demoCredentials) {
     const urlResult = validateUrl(form.value.baseUrl)
-    if (!urlResult.valid) { formError.value = urlResult.error ?? t('form.invalidUrl'); return }
+    if (!urlResult.valid) { formError.value = urlResult.messageKey ? t(urlResult.messageKey) : t('form.invalidUrl'); return }
   }
 
   saving.value = true

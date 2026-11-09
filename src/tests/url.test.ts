@@ -43,59 +43,67 @@ describe('validateUrl', () => {
   it('rejects empty URL', () => {
     const result = validateUrl('')
     expect(result.valid).toBe(false)
-    expect(result.error).toContain('required')
+    expect(result.messageKey).toBe('form.urlRequired')
   })
 
   it('rejects missing protocol', () => {
     const result = validateUrl('192.168.1.100')
     expect(result.valid).toBe(false)
+    expect(result.messageKey).toBe('form.urlSchemeRequired')
   })
 
   it('rejects embedded username in URL', () => {
     const result = validateUrl('http://user@host:4096')
     expect(result.valid).toBe(false)
-    expect(result.error).toContain('credentials')
+    expect(result.messageKey).toBe('form.urlEmbeddedCredentials')
   })
 
   it('rejects embedded username:password in URL', () => {
     const result = validateUrl('http://user:pass@host:4096')
     expect(result.valid).toBe(false)
-    expect(result.error).toContain('credentials')
+    expect(result.messageKey).toBe('form.urlEmbeddedCredentials')
+  })
+
+  it('rejects the placeholder URL', () => {
+    const result = validateUrl('http://192.168.1.xxx:4096')
+    expect(result.valid).toBe(false)
+    expect(result.messageKey).toBe('form.urlPlaceholder')
   })
 
   it('rejects invalid format', () => {
     const result = validateUrl('not a url')
     expect(result.valid).toBe(false)
+    expect(result.messageKey).toBeDefined()
   })
 
   it('warns about non-LAN HTTP', () => {
     const result = validateUrl('http://example.com:4096')
     expect(result.valid).toBe(true)
-    expect(result.error).toContain('not secure')
+    expect(result.messageKey).toBe('form.urlInsecureHttp')
   })
 
   it('accepts LAN HTTP without warning', () => {
     const result = validateUrl('http://192.168.1.100:4096')
     expect(result.valid).toBe(true)
-    expect(result.error).toBeUndefined()
+    expect(result.messageKey).toBeUndefined()
   })
 
   it('accepts localhost HTTP', () => {
     const result = validateUrl('http://localhost:4096')
     expect(result.valid).toBe(true)
-    expect(result.error).toBeUndefined()
+    expect(result.messageKey).toBeUndefined()
   })
 
   it('accepts Tailscale CGNAT HTTP without warning', () => {
     const result = validateUrl('http://100.64.12.34:4096')
     expect(result.valid).toBe(true)
-    expect(result.error).toBeUndefined()
+    expect(result.messageKey).toBeUndefined()
   })
 
   it('accepts local mDNS HTTP without warning', () => {
     const result = validateUrl('http://opencode.local:4096')
     expect(result.valid).toBe(true)
-    expect(result.error).toBeUndefined()
+    expect(result.messageKey).toBeUndefined()
   })
 })
 

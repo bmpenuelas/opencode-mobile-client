@@ -60,4 +60,12 @@ describe('injected toolbar script', () => {
     expect(document.getElementById('oc-tab-label')?.textContent).toContain('الخيارات')
     expect(document.getElementById('oc-panel-url')?.textContent).toBe('example.com:4096')
   })
+
+  it('updates an existing panel dir attribute when re-injected with a new direction', () => {
+    runScript(buildToolbarScript('connected', 'example.com:4096', false))
+    expect(document.getElementById('oc-panel')?.getAttribute('dir')).toBe('ltr')
+
+    runScript(buildToolbarScript('connected', 'example.com:4096', true))
+    expect(document.getElementById('oc-panel')?.getAttribute('dir')).toBe('rtl')
+  })
 })

@@ -140,8 +140,22 @@
     direction: ltr;
     unicode-bidi: isolate;
   }
-  html[lang="ar"] body {
-    line-height: 1.65;
-    letter-spacing: 0;
-  }
+}
+
+/* Arabic typography: unlayered so it overrides Tailwind's font-size line-heights and tracking utilities. */
+html[lang="ar"] {
+  --text-xs--line-height: 1.6;
+  --text-sm--line-height: 1.6;
+  --text-base--line-height: 1.65;
+  --text-lg--line-height: 1.6;
+  --text-xl--line-height: 1.6;
+}
+
+html[lang="ar"] body {
+  line-height: 1.65;
+  letter-spacing: 0;
+}
+
+html[lang="ar"] body * {
+  letter-spacing: 0;
 }

@@ -50,11 +50,24 @@ No `origin` remote is configured yet, so nothing is pushed anywhere except
 
 ## Upstream distribution links
 
-`README.md`, `docs/index.html`, and the store badges in
-`src/components/StoreBadges.vue` link to the **published upstream app**
-(`com.logicedge.opencodemobile`, App Store, VS Code). Those links are left
-pointing at upstream on purpose: this fork is a personal build and is not
-published on any store.
+`README.md`, `docs/index.html`, the store badges in
+`src/components/StoreBadges.vue`, and the in-app "find the code on GitHub" links
+in `SettingsScreen.vue` and `HelpScreen.vue` all point to the **published
+upstream project** (`com.logicedge.opencodemobile`, GitHub, App Store, VS Code).
+Those links are left pointing at upstream on purpose: this fork is a personal
+build and is not published on any store or remote yet.
+
+## Injected WebView direction design notes
+
+- **Direction independence:** The OpenCode WebView's layout direction is
+  controlled entirely by the **OpenCode interface direction** setting (default `ltr`),
+  independently of the app UI language. The injected pull menu layout mirrors (RTL)
+  when that setting is `rtl`, while its labels always follow the app UI language.
+- **Platform script timing:** On iOS, the direction script installs at
+  `.atDocumentStart` and uses a `MutationObserver` to set `dir` as soon as the
+  root element appears. On Android, the underlying Capacitor InAppBrowser plugin
+  injects `preShowScript` after page load (`onPageFinished`), so a brief initial
+  paint before the direction flip is an inherent plugin limitation on Android.
 
 ## Syncing upstream changes
 

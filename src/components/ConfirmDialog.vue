@@ -17,21 +17,24 @@
 import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { useI18n } from '@/i18n'
+
+const { t } = useI18n()
 
 const visible = ref(false)
 const title = ref('')
 const message = ref('')
-const confirmText = ref('Confirm')
-const cancelText = ref('Cancel')
+const confirmText = ref(t('common.confirm'))
+const cancelText = ref(t('common.cancel'))
 
 type ResolveFn = (value: boolean) => void
 let resolver: ResolveFn | null = null
 
 function show(opts: { title?: string; message: string; confirmText?: string; cancelText?: string }): Promise<boolean> {
-  title.value = opts.title ?? 'Confirm'
+  title.value = opts.title ?? t('common.confirm')
   message.value = opts.message
-  confirmText.value = opts.confirmText ?? 'Confirm'
-  cancelText.value = opts.cancelText ?? 'Cancel'
+  confirmText.value = opts.confirmText ?? t('common.confirm')
+  cancelText.value = opts.cancelText ?? t('common.cancel')
   visible.value = true
   return new Promise((resolve) => { resolver = resolve })
 }

@@ -14,7 +14,11 @@ export const useConnectionStore = defineStore('connection', () => {
   const state = ref<ConnectionState>('idle')
   const activeServerId = ref<string | null>(null)
   const reconnectAttempt = ref(0)
-  const lastError = ref<string | null>(null)
+  const lastErrorKey = ref<string | null>(null)
+  const lastErrorValues = ref<Record<string, string | number>>({})
+  const lastError = computed<string | null>(() => {
+    return lastErrorKey.value ? t(lastErrorKey.value, lastErrorValues.value) : null
+  })
   const healthCheckTimeout = ref(DEFAULT_TIMEOUT)
   const healthPollInterval = ref(DEFAULT_POLL_INTERVAL)
   const exponentialReconnectEnabled = ref(true)
@@ -57,13 +61,15 @@ export const useConnectionStore = defineStore('connection', () => {
     const profile = serverStore.profiles.find((p: ServerProfile) => p.id === serverId)
     if (!profile) {
       state.value = 'unreachable'
-      lastError.value = t('connection.profileNotFound')
+      lastErrorKey.value = 'connection.profileNotFound'
+      lastErrorValues.value = {}
       return false
     }
 
     activeServerId.value = serverId
     state.value = 'checking'
-    lastError.value = null
+    lastErrorKey.value = null
+    lastErrorValues.value = {}
     iframeLoadingFailed.value = false
 
     const password = await serverStore.getPassword(serverId)
@@ -93,12 +99,14 @@ export const useConnectionStore = defineStore('connection', () => {
 
     if (result.status === 'wrong_credentials') {
       state.value = 'wrong_credentials'
-      lastError.value = t('connection.wrongCredentialsMessage')
+      lastErrorKey.value = 'connection.wrongCredentialsMessage'
+      lastErrorValues.value = {}
       return false
     }
 
     state.value = 'unreachable'
-    lastError.value = t('connection.serverUnreachable', { url: profile.baseUrl })
+    lastErrorKey.value = 'connection.serverUnreachable'
+    lastErrorValues.value = { url: profile.baseUrl }
     return false
   }
 
@@ -196,7 +204,8 @@ export const useConnectionStore = defineStore('connection', () => {
   function disconnect(): void {
     cleanup()
     state.value = 'disconnected'
-    lastError.value = null
+    lastErrorKey.value = null
+    lastErrorValues.value = {}
     activeServerId.value = null
     iframeLoadingFailed.value = false
   }

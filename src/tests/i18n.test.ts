@@ -28,6 +28,23 @@ describe('catalogues', () => {
       expect(catalogKeys(code).filter((key) => !english.includes(key))).toEqual([])
     }
   })
+
+  it('every Arabic entry contains Arabic text and differs from English', async () => {
+    const { catalogKeys, t, setLocale } = await loadI18n()
+    const arabicRegex = /[\u0600-\u06FF]/
+    const keys = catalogKeys('en-US')
+
+    setLocale('en-US')
+    const englishMap: Record<string, string> = {}
+    for (const k of keys) englishMap[k] = t(k)
+
+    setLocale('ar')
+    for (const k of keys) {
+      const arVal = t(k)
+      expect(arVal).toMatch(arabicRegex)
+      expect(arVal).not.toBe(englishMap[k])
+    }
+  })
 })
 
 describe('direction', () => {

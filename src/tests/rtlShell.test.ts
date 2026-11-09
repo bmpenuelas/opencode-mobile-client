@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import DemoSessionMock from '@/components/DemoSessionMock.vue'
 import ServerList from '@/components/ServerList.vue'
 import ServerProfileForm from '@/components/ServerProfileForm.vue'
+import { Switch } from '@/components/ui/switch'
 
 const profile = {
   id: 'p1',
@@ -87,5 +88,11 @@ describe('RTL shell layout', () => {
 
     expect(wrapper.find('#username').attributes('dir')).toBe('ltr')
     expect(wrapper.find('#password').attributes('dir')).toBe('ltr')
+  })
+
+  it('provides an RTL override for the checked switch thumb', () => {
+    const wrapper = mount(Switch)
+    const thumb = wrapper.find('[data-slot="switch-thumb"]')
+    expect(thumb.classes().some((c) => c.startsWith('rtl:') && c.includes('translate-x-[calc(-100%+2px)]'))).toBe(true)
   })
 })

@@ -13,10 +13,13 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from '@/components/ui/button'
 import DialogOverlay from "./DialogOverlay.vue"
+import { useI18n } from '@/i18n'
 
 defineOptions({
   inheritAttrs: false,
 })
+
+const { t } = useI18n()
 
 const props = withDefaults(defineProps<DialogContentProps & { class?: HTMLAttributes["class"], showCloseButton?: boolean }>(), {
   showCloseButton: true,
@@ -45,7 +48,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       >
         <Button variant="ghost" class="absolute top-2 end-2" size="icon-sm">
           <XIcon />
-          <span class="sr-only">Close</span>
+          <span class="sr-only">{{ t('common.close') }}</span>
         </Button>
       </DialogClose>
     </DialogContent>
