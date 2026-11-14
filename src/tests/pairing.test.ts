@@ -10,12 +10,14 @@ vi.mock('@capacitor/core', () => ({
 import {
   buildPairingConnectUrl,
   isLoopbackLink,
+  isVirtualNetworkLink,
   mintPairingCode,
   parsePairingLink,
   redeemPairingLink,
   renewSession,
   sessionExpiresAt,
   shouldRenewSession,
+  withAddress,
 } from '@/services/opencode/pairing'
 import { buildBasicAuthHeader } from '@/services/opencode/auth'
 
@@ -65,6 +67,28 @@ describe('isLoopbackLink', () => {
     expect(isLoopbackLink({ code: 'a', urls: ['http://127.0.0.1:49374'] })).toBe(true)
     expect(isLoopbackLink({ code: 'a', urls: ['http://localhost:49374', 'http://[::1]:49374'] })).toBe(true)
     expect(isLoopbackLink({ code: 'a', urls: ['http://127.0.0.1:49374', 'http://192.168.1.20:49374'] })).toBe(false)
+  })
+})
+
+describe('isVirtualNetworkLink', () => {
+  it('spots a link that only lists WSL or Docker addresses', () => {
+    expect(isVirtualNetworkLink({ code: 'a', urls: ['http://172.21.113.223:49374'] })).toBe(true)
+    expect(isVirtualNetworkLink({ code: 'a', urls: ['http://172.17.0.2:4096', 'http://172.31.0.9:4096'] })).toBe(true)
+    expect(isVirtualNetworkLink({ code: 'a', urls: ['http://172.21.113.223:49374', 'http://192.168.1.20:49374'] })).toBe(false)
+    expect(isVirtualNetworkLink({ code: 'a', urls: ['http://172.32.0.1:4096'] })).toBe(false)
+  })
+})
+
+describe('withAddress', () => {
+  const link = { code: 'abc123', urls: ['http://172.21.113.223:49374'] }
+
+  it('keeps the code and replaces every address', () => {
+    expect(withAddress(link, ' 100.99.148.124:4096/ ')).toEqual({ code: 'abc123', urls: ['http://100.99.148.124:4096'] })
+    expect(withAddress(link, 'https://box.tailnet.ts.net')).toEqual({ code: 'abc123', urls: ['https://box.tailnet.ts.net'] })
+  })
+
+  it.each(['', '   ', 'http://u:p@host:1', 'ftp://host', 'http://host:1/?x=1'])('rejects %j', (value) => {
+    expect(withAddress(link, value)).toBeNull()
   })
 })
 

@@ -44,7 +44,8 @@ describe('setup tip strings', () => {
     'tips.chipUsername', 'tips.scanDark', 'tips.manualStart', 'tips.manualEnter', 'tips.v1Start', 'tips.v1Password',
     'tips.v1Upgrade', 'tips.linkOk', 'tips.linkInvalid', 'tips.landing', 'tips.offline', 'tips.offlinePaired',
     'tips.authRequired', 'tips.pairAgain', 'tips.wrongPassword', 'tips.incompatible', 'help.serveText', 'help.awayText',
-    'help.address', 'help.addressText',
+    'help.address', 'help.addressText', 'tips.linkVirtual', 'form.pairingUnreachableAt', 'form.pairingAddress',
+    'form.pairingAddressHint', 'form.useAddress',
   ]
 
   it('are translated in every catalog', () => {

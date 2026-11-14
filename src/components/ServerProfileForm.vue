@@ -31,6 +31,14 @@
               <component :is="linkFeedback.ok ? CircleCheck : TriangleAlert" class="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
               <span class="min-w-0 break-words">{{ linkFeedback.text }}</span>
             </p>
+            <div v-if="showAddress" class="flex flex-col gap-1.5">
+              <Label for="pairingAddress" class="text-center justify-center">{{ t('form.pairingAddress') }}</Label>
+              <Input id="pairingAddress" v-model="form.pairingAddress" placeholder="http://192.168.1.100:4096" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" />
+              <p class="text-xs text-muted-foreground">{{ t('form.pairingAddressHint') }}</p>
+            </div>
+            <Button v-else-if="parsedLink" type="button" variant="link" size="xs" class="self-center" @click="showAddress = true">
+              {{ t('form.useAddress') }}
+            </Button>
             <Button v-if="canScan" type="button" variant="outline" :disabled="scanning" @click="scanPairingCode">
               <QrCode class="h-4 w-4" />
               {{ t('form.scanQr') }}
@@ -102,7 +110,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useServerStore } from '@/stores/serverStore'
 import { normalizeUrl, sanitizeUrlForDisplay, validateUrl } from '@/services/opencode/url'
-import { isLoopbackLink, parsePairingLink, redeemPairingLink, V2_USERNAME } from '@/services/opencode/pairing'
+import { isLoopbackLink, isVirtualNetworkLink, parsePairingLink, redeemPairingLink, V2_USERNAME, withAddress, type PairingLink } from '@/services/opencode/pairing'
 import { isDemoModeCredentials } from '@/services/opencode/demoMode'
 import { canScanQrCode, scanQrCode } from '@/services/platform/qrScanner'
 import type { ServerProfile } from '@/types'
@@ -129,7 +137,9 @@ const form = ref({
   legacyV1: false,
   manual: false,
   pairingLink: '',
+  pairingAddress: '',
 })
+const showAddress = ref(false)
 
 const canScan = canScanQrCode()
 const usesPairing = computed(() => !form.value.legacyV1 && !form.value.manual)
@@ -159,14 +169,33 @@ const setupSteps = computed(() => {
   ]
 })
 
+const parsedLink = computed(() => parsePairingLink(form.value.pairingLink))
+const typedAddress = computed(() => form.value.pairingAddress.trim())
+// The link as it will be redeemed: its own addresses, or the one typed in their place.
+const pairingTarget = computed(() => {
+  const link = parsedLink.value
+  if (!link || !showAddress.value || !typedAddress.value) return link
+  return withAddress(link, typedAddress.value)
+})
+
+watch(parsedLink, (link) => {
+  if (link && isVirtualNetworkLink(link)) showAddress.value = true
+})
+
+function hostsOf(link: PairingLink): string {
+  return link.urls.map((url) => new URL(url).host).join(', ')
+}
+
 // Catches a link that can't work before it spends the single-use code.
 const linkFeedback = computed(() => {
-  const value = form.value.pairingLink.trim()
-  if (!value) return null
-  const link = parsePairingLink(value)
+  if (!form.value.pairingLink.trim()) return null
+  const link = parsedLink.value
   if (!link) return { ok: false, text: t('tips.linkInvalid') }
-  if (isLoopbackLink(link)) return { ok: false, text: t('form.pairingLoopback') }
-  return { ok: true, text: t('tips.linkOk', { host: new URL(link.urls[0]).host }) }
+  const target = pairingTarget.value
+  if (!target) return { ok: false, text: t('form.invalidUrl') }
+  if (isLoopbackLink(target)) return { ok: false, text: t('form.pairingLoopback') }
+  if (target === link && isVirtualNetworkLink(link)) return { ok: false, text: t('tips.linkVirtual', { host: hostsOf(link) }) }
+  return { ok: true, text: t('tips.linkOk', { host: hostsOf(target) }) }
 })
 
 const showPassword = ref(false)
@@ -250,8 +279,9 @@ async function resolvePairing(): Promise<{ connection: Connection; token: string
     return null
   }
 
-  const link = parsePairingLink(value)
-  if (!link) { formError.value = t('form.pairingInvalid'); return null }
+  if (!parsedLink.value) { formError.value = t('form.pairingInvalid'); return null }
+  const link = pairingTarget.value
+  if (!link) { formError.value = t('form.invalidUrl'); return null }
 
   const result = await redeemPairingLink(link)
   if (result.type === 'paired') {
@@ -261,7 +291,12 @@ async function resolvePairing(): Promise<{ connection: Connection; token: string
     }
   }
   if (result.type === 'expired') formError.value = t('form.pairingExpired')
-  else formError.value = t(isLoopbackLink(link) ? 'form.pairingLoopback' : 'form.pairingUnreachable')
+  else if (isLoopbackLink(link)) formError.value = t('form.pairingLoopback')
+  else {
+    // The code is still unused, so it can be sent to an address the phone does reach.
+    formError.value = t('form.pairingUnreachableAt', { host: hostsOf(link) })
+    showAddress.value = true
+  }
   return null
 }
 

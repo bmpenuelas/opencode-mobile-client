@@ -70,6 +70,25 @@ export function parsePairingLink(value: string): PairingLink | null {
   }
 }
 
+/**
+ * Keeps the link's code but sends it to an address the user typed, for when the
+ * computer only lists addresses the phone can't reach, as with WSL or Docker.
+ */
+export function withAddress(link: PairingLink, address: string): PairingLink | null {
+  const value = address.trim()
+  // normalizeUrl would turn "ftp://host" into "http://ftp://host", so other schemes stop here.
+  if (!value || (/^[a-z][a-z\d+.-]*:\/\//i.test(value) && !/^https?:\/\//i.test(value))) return null
+  const url = serverAddress(value)
+  return url ? { urls: [url], code: link.code } : null
+}
+
+// WSL and Docker give their machines addresses in 172.16.0.0/12, which only the host can reach.
+const VIRTUAL_NETWORK = /^172\.(1[6-9]|2\d|3[01])\./
+
+export function isVirtualNetworkLink(link: PairingLink): boolean {
+  return link.urls.every((value) => VIRTUAL_NETWORK.test(new URL(value).hostname))
+}
+
 export function isLoopbackLink(link: PairingLink): boolean {
   return link.urls.every((value) => {
     const { hostname } = new URL(value)
