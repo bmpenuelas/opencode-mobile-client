@@ -133,6 +133,13 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // Distinct applicationId so debug builds can be installed side-by-side
+            // with the production APK without uninstalling it (different signatures)
+            applicationIdSuffix ".debug"
+            // Distinct launcher label so the two icons are easy to tell apart
+            resValue "string", "app_name", "OpenCode Mobile DEBUG"
+        }
         release {
             if (releaseSigningReady && releaseStoreFileExists) {
                 signingConfig signingConfigs.release
