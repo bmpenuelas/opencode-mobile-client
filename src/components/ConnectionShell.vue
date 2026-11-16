@@ -2,12 +2,14 @@
   <DemoSessionMock
     v-if="demoModeActive && profile"
     :profile-name="profile.name"
+    @back="goHome"
   />
 
   <div v-else class="fixed inset-0 flex flex-col items-center justify-center z-[1] bg-background">
     <div v-if="loading" class="flex flex-col items-center gap-4">
       <div class="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-foreground" />
       <p class="text-sm text-muted-foreground">{{ t('connection.loading') }}</p>
+      <Button variant="outline" @click="goHome">{{ t('common.back') }}</Button>
     </div>
 
     <div v-else-if="errorText" class="flex flex-col items-center gap-4 text-center max-w-[300px]">
@@ -62,6 +64,8 @@ const serverId = computed(() => route.params.id as string)
 const profile = computed(() => serverStore.profiles.find(p => p.id === serverId.value))
 const demoModeActive = ref(false)
 const connectionTip = computed(() => profile.value ? serverTip(profile.value, connectionStore.state) : null)
+
+let disposed = false
 
 let browserClosedHandle: any = null
 let pageLoadedHandle: any = null
@@ -526,10 +530,12 @@ async function handleWebviewNotificationMessage(detail: unknown): Promise<void> 
 
 onMounted(async () => {
   await serverStore.load()
+  if (disposed) return
   if (!profile.value) { router.push('/'); return }
   registerBackButton(handleBackButton)
 
   const connected = await connectionStore.connect(profile.value.id)
+  if (disposed) { connectionStore.disconnect(); return }
   if (!connected) {
     loading.value = false
     errorText.value = connectionStore.lastError ?? t('connection.unreachable')
@@ -538,6 +544,7 @@ onMounted(async () => {
 
   connectionStore.lastWebviewServerId = profile.value.id
   demoModeActive.value = await isCurrentProfileDemoMode()
+  if (disposed) return
 
   if (demoModeActive.value) {
     loading.value = false
@@ -552,6 +559,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  disposed = true
   unregisterBackButton()
   removeWebviewListeners()
   resolveNotificationPrompt(false)
@@ -593,6 +601,7 @@ async function openInAppBrowser(): Promise<void> {
       ? buildIframeUrl(profile.value!.baseUrl, profile.value!.username, pw!)
       : buildIframeUrl(profile.value!.baseUrl)
 
+  if (disposed) return
   if (!url) { showSignInFailed(); return }
 
   browserClosedHandle = await InAppBrowser.addListener('closeEvent', () => {
@@ -702,6 +711,7 @@ async function openInNewTabFallback(): Promise<void> {
       profile.value!.authEnabled ? profile.value!.username : undefined,
       profile.value!.authEnabled && pw ? pw : undefined,
     )
+  if (disposed) return
   if (!url) { showSignInFailed(); return }
   window.open(url, '_blank')
   loading.value = false
@@ -713,9 +723,11 @@ async function retry(): Promise<void> {
   loading.value = true
   if (!profile.value) { goHome(); return }
   const connected = await connectionStore.connect(profile.value.id)
+  if (disposed) { connectionStore.disconnect(); return }
   if (connected) {
     connectionStore.lastWebviewServerId = profile.value.id
     demoModeActive.value = await isCurrentProfileDemoMode()
+    if (disposed) return
     if (demoModeActive.value) {
       loading.value = false
       return

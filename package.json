@@ -1,7 +1,7 @@
 {
   "name": "opencode-mobile-client",
   "private": true,
-  "version": "1.2.6",
+  "version": "1.2.8",
   "type": "module",
   "scripts": {
     "dev": "vite",

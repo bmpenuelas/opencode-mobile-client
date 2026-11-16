@@ -1,3 +1,4 @@
+import iosPackageManifest from '../../ios/App/CapApp-SPM/Package.swift?raw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { isNativePlatform, scanBarcode } = vi.hoisted(() => ({
@@ -17,6 +18,11 @@ import { canScanQrCode, scanQrCode } from '@/services/platform/qrScanner'
 const QR_TEXT = JSON.stringify({ code: 'abc_DEF-123', urls: ['http://192.168.1.2:49374', 'http://100.64.0.3:49374'] })
 
 describe('qrScanner', () => {
+  it('is linked into the iOS native app', () => {
+    expect(iosPackageManifest).toContain('.package(name: "CapacitorBarcodeScanner", path: "../../../node_modules/@capacitor/barcode-scanner")')
+    expect(iosPackageManifest).toContain('.product(name: "CapacitorBarcodeScanner", package: "CapacitorBarcodeScanner")')
+  })
+
   beforeEach(() => {
     scanBarcode.mockReset()
     isNativePlatform.mockReturnValue(true)

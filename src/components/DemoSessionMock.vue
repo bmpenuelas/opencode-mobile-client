@@ -2,7 +2,10 @@
   <div class="min-h-dvh bg-background text-foreground flex flex-col">
     <header class="sticky top-0 z-10 border-b bg-background/95 backdrop-blur px-4 py-3">
       <div class="flex items-center justify-between gap-3">
-        <div class="min-w-0">
+        <Button variant="ghost" size="icon" :aria-label="t('common.back')" @click="emit('back')">
+          <ArrowLeft class="h-4 w-4" />
+        </Button>
+        <div class="min-w-0 flex-1">
           <p class="text-sm font-semibold truncate">{{ t('demo.title') }}</p>
           <p class="text-xs text-muted-foreground truncate">{{ profileName }}</p>
         </div>
@@ -57,6 +60,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { ArrowLeft } from '@lucide/vue'
+import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n'
 
 interface DemoMessage {
@@ -68,6 +73,7 @@ interface DemoMessage {
 defineProps<{
   profileName: string
 }>()
+const emit = defineEmits<{ back: [] }>()
 const { t } = useI18n()
 
 const draft = ref(t('demo.draft'))
