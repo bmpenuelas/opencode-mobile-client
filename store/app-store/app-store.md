@@ -2,7 +2,7 @@
 
 ## App name
 
-OpenCode Mobile
+OpenCode-Mobile Community
 
 ## Subtitle
 
