@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ equivalent of backup_rules.xml. Same exclusion for cloud backup and for
+     device-to-device transfer: Keystore keys do not move, so the encrypted secrets are useless. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="WSSecureStorageSharedPreferences.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="WSSecureStorageSharedPreferences.xml" />
+    </device-transfer>
+</data-extraction-rules>

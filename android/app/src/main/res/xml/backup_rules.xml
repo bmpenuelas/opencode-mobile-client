@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 6-11 Auto Backup. Everything is backed up by default (server profiles live in
+     CapacitorStorage, UI preferences in WebView localStorage), except the secret store:
+     its values are encrypted with an Android Keystore key that is never backed up, so a
+     restored copy could not be decrypted. Users re-enter or re-pair after a restore. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="WSSecureStorageSharedPreferences.xml" />
+</full-backup-content>
