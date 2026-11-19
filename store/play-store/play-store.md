@@ -2,7 +2,7 @@
 
 ## App name
 
-OpenCode Mobile <Client>
+OpenCode Mobile (community)
 
 ## Short description
 

@@ -1,0 +1,1 @@
+Standart OpenCode’da model seçicilerin gönder düğmesiyle çakışmasına yönelik düzeltmeler eklendi.

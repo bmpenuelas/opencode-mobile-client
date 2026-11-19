@@ -1,0 +1,2 @@
+# Store listing files are uploaded byte for byte by fastlane: keep them LF on every platform.
+store/fastlane/**/*.txt text eol=lf

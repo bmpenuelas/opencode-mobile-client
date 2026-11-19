@@ -12,7 +12,7 @@ OpenCode सर्वरों के लिए मोबाइल क्ला�
 
 ## Keywords
 
-opencode, mobile, ai, agent, client, कोड, प्रोग्रामिंग, सर्वर, रिमोट
+opencode,mobile,ai,agent,client,कोड,प्रोग्रामिंग,सर्वर
 
 ## Description
 

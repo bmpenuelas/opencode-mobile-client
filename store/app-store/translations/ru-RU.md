@@ -8,11 +8,11 @@ OpenCode-Mobile Community
 
 ## Promotional text
 
-Общайтесь с агентами OpenCode на телефоне и легко продолжайте разговоры между компьютером и iPhone.
+Общайтесь с агентами OpenCode на телефоне и легко продолжайте разговоры между компьютером и iPhone
 
 ## Keywords
 
-opencode, mobile, ai, agent, client, код, программирование, сервер, удалённо
+opencode,mobile,ai,agent,client,код,программирование,сервер
 
 ## Description
 

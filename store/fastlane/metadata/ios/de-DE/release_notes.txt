@@ -1,0 +1,1 @@
+Korrekturen für Modell-Auswahlfelder der Standardversion von OpenCode, die den Senden-Button überlagern.

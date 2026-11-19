@@ -1,0 +1,37 @@
+OpenCode Mobile does not include, create, configure, manage, or monitor any VPN functionality. It does not use NetworkExtension, a packet-tunnel provider, an app-proxy provider, or any VPN entitlement.
+References to VPN or Tailscale only explain that a user may independently use an existing VPN/private network to reach their own self-hosted OpenCode server. The app uses the device’s normal network connection and does not inspect, route, capture, or alter VPN traffic.
+What user information is collected using VPN?
+None. The app does not have any VPN functionality and therefore it does not collect any user information using VPN.
+
+Why is this information collected?
+No VPN-related information is collected or used for any purpose. (the app does not even have any VPN functionality at all)
+
+Is this data shared with third parties or stored elsewhere?
+No. The app does not have any VPN functionality. So no VPN data is collected and therefore no VPN-related data is shared with third parties or stored on developer-controlled servers.
+
+The app stores user-configured server profile details locally on the device: profile name, server URL, and username in local app storage; passwords and pairing session tokens are stored in the iOS Keychain. The app has no developer-operated backend, analytics, advertising, or crash-reporting service.
+When a user connects, requests are sent directly to the OpenCode server they configured and control. Any data handled by that server is governed by that server owner’s practices, not collected by this app.
+
+1- Regarding Guideline 2.3.10 - Performance - Accurate Metadata
+
+Thank you. We have updated the App Store description to remove Android references.
+
+2- Regarding Guideline 2.1 - Information Needed
+
+For testing, please use the app’s built-in demo account:
+
+Host: http://192.168.1.123:4096
+Username: demo_user_1234
+Password: demo_password_12345678
+
+Testing steps:
+
+1- Open the app and select Add Server.
+2- Enter any server name.
+3- Tap "Use URL and password instead", enter the host and enable Authentication.
+4- Enter the demo username and password above.
+5- Save the server profile and select Connect.
+
+This demo account activates an in-app demonstration session for App Review and does not access a live server or contain personal, customer, or production data.
+
+This app is a client. So for regular use, it connects to an OpenCode server that the user runs on their own computer or server, therefore they will connect to their own host and use their own login details.

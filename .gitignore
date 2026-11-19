@@ -28,3 +28,21 @@ assets/
 
 # Native
 android/keystore.properties
+
+# Store listings: API keys (any .p8 too), rds's fastlane gems and run output, downloaded live
+# listings, local-only App Review contact details, and generated screenshots/graphics.
+.rds/
+*.p8
+store/fastlane/play-service-account*.json
+store/fastlane/app-store-connect-api-key*.json
+store/fastlane/report.xml
+store/fastlane/test_output/
+store/fastlane/downloaded/
+store/fastlane/Preview.html
+store/fastlane/screenshots/screenshots.html
+store/fastlane/metadata/ios/review_information/first_name.txt
+store/fastlane/metadata/ios/review_information/last_name.txt
+store/fastlane/metadata/ios/review_information/phone_number.txt
+store/fastlane/metadata/ios/review_information/email_address.txt
+store/fastlane/metadata/ios/review_information/demo_user.txt
+store/fastlane/metadata/ios/review_information/demo_password.txt

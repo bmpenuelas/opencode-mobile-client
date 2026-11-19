@@ -1,0 +1,1 @@
+Corretto il problema dei selettori di modello di OpenCode standard che si sovrapponevano al pulsante di invio.

@@ -4,7 +4,7 @@
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -64,7 +64,7 @@ Bei aktivierter Authentifizierung ist in der App „opencode“ als Standardnutz
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -124,7 +124,7 @@ Cuando la autenticación está activada, el nombre de usuario predeterminado de 
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -184,7 +184,7 @@ Lorsque l’authentification est activée, le nom d’utilisateur par défaut da
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -244,7 +244,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -304,7 +304,7 @@ Com a autenticação ativa, o nome de utilizador predefinido na app é opencode.
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -364,7 +364,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -424,7 +424,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -484,7 +484,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -544,7 +544,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -604,7 +604,7 @@ Quando l’autenticazione è attiva, il nome utente predefinito nell’app è op
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -664,7 +664,7 @@ Kimlik doğrulama etkin olduğunda uygulamadaki varsayılan kullanıcı adı ope
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -724,7 +724,7 @@ Saat autentikasi aktif, nama pengguna default di aplikasi adalah opencode.
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 
@@ -784,7 +784,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 
 ## App name
 
-OpenCode Mobile
+OpenCode Mobile (community)
 
 ## Short description
 

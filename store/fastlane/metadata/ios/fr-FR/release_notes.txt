@@ -1,0 +1,1 @@
+Correction des sélecteurs de modèles d’OpenCode standard qui chevauchaient le bouton d’envoi.

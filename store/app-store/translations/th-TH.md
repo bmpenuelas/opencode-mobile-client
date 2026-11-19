@@ -12,7 +12,7 @@ OpenCode-Mobile Community
 
 ## Keywords
 
-opencode, mobile, ai, agent, client, โค้ด, พัฒนา, เซิร์ฟเวอร์, ระยะไกล
+opencode,mobile,ai,agent,client,โค้ด,พัฒนา,เซิร์ฟเวอร์
 
 ## Description
 
